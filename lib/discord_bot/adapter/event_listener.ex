@@ -11,4 +11,6 @@ defmodule DiscordBot.Adapter.EventListener do
         :ignore
     end
   end
+
+  def handle_event(_event), do: :ignore
 end
