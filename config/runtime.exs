@@ -116,8 +116,12 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
 
-discord_bot_token =
-  System.get_env("DISCORD_BOT_TOKEN") ||
-    raise "environment variable DISCORD_BOT_TOKEN is missing."
+if config_env() != :test do
+  discord_bot_token =
+    System.get_env("DISCORD_BOT_TOKEN") ||
+      raise "environment variable DISCORD_BOT_TOKEN is missing."
 
-config :nostrum, token: discord_bot_token
+  config :nostrum,
+    token: discord_bot_token,
+    gateway_intents: [:guild_messages, :message_content]
+end
