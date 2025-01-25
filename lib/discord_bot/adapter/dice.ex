@@ -4,7 +4,8 @@ defmodule DiscordBot.Adapter.Dice do
 
     with %{"count" => count, "sides" => sides} <-
            Regex.named_captures(~r/^(?<count>\d+)d(?<sides>\d+)$/, normalized_downcase) do
-      roll_dice(String.to_integer(count), String.to_integer(sides))
+      total = roll_dice(String.to_integer(count), String.to_integer(sides))
+      "(#{count}d#{sides}) -> #{total}"
     end
   end
 
