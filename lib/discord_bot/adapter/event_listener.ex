@@ -7,6 +7,7 @@ defmodule DiscordBot.Adapter.EventListener do
     case msg.content do
       "ping!" ->
         Api.create_message(msg.channel_id, "I copy and pasted this code")
+
       _ ->
         :ignore
     end

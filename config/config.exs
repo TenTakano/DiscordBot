@@ -61,8 +61,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :discord_bot, DiscordBot.Adapter,
-  start_listener: true
+config :discord_bot, DiscordBot.Adapter, start_listener: true
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
