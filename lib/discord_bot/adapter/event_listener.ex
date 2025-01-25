@@ -1,21 +1,14 @@
 defmodule DiscordBot.Adapter.EventListener do
   use Nostrum.Consumer
 
-  alias Nostrum.Api.Message
+  alias Nostrum.Api
 
-  @impl Nostrum.Consumer
-  def handle_event({:MESSAGE_CREATE, %{author: %{bot: nil}} = msg, _ws_state}) do
-    IO.inspect msg
+  def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
     case msg.content do
       "ping!" ->
-        Message.create(msg.channel_id, "pong!")
+        Api.create_message(msg.channel_id, "I copy and pasted this code")
       _ ->
         :ignore
     end
-  end
-
-  def handle_event(event, _ws_state) do
-    IO.inspect event
-    :ignore
   end
 end
