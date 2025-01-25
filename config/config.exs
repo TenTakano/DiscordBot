@@ -63,6 +63,8 @@ config :phoenix, :json_library, Jason
 
 config :discord_bot, DiscordBot.Adapter, start_listener: true
 
+config :discord_bot, DiscordBot.RandomUtil, DiscordBot.RandomUtil.Impl
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

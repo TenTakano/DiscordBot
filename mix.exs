@@ -58,6 +58,7 @@ defmodule DiscordBot.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:mox, "~> 1.2"},
       {:nostrum, "~> 0.10"}
     ]
   end
