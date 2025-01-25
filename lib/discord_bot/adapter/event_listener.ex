@@ -4,18 +4,12 @@ defmodule DiscordBot.Adapter.EventListener do
   alias Nostrum.Api
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
-    case msg.content do
-      "ping!" ->
-        Api.create_message(msg.channel_id, "I copy and pasted this code")
+    case DiscordBot.Adapter.Dice.filter_and_roll_dice(msg.content) do
+      result when is_binary(result) ->
+        Api.create_message(msg.channel_id, "#{msg.author.username}: #{result}")
 
-      content ->
-        case DiscordBot.Adapter.Dice.filter_and_roll_dice(content) do
-          result when is_binary(result) ->
-            Api.create_message(msg.channel_id, "#{msg.author.username}: #{result}")
-
-          nil ->
-            :ignore
-        end
+      nil ->
+        :ignore
     end
   end
 
