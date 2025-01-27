@@ -1,8 +1,4 @@
-# Build Stage
-ARG ELIXIR_VERSION
-ARG ERLANG_MAJOR_VERSION
-
-FROM elixir:${ELIXIR_VERSION}-otp-${ERLANG_MAJOR_VERSION}-alpine AS builder
+FROM elixir:1.18.1-otp-27-alpine AS builder
 
 WORKDIR /app
 COPY . .
