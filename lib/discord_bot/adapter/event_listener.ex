@@ -1,8 +1,7 @@
 defmodule DiscordBot.Adapter.EventListener do
   use Nostrum.Consumer
 
-  alias Nostrum.Api
-  alias DiscordBot.Adapter.Ip
+  alias DiscordBot.Adapter.{Api, Ip}
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
     case msg.content do
