@@ -4,17 +4,24 @@ defmodule DiscordBot.Adapter.EventListener do
   alias DiscordBot.Adapter.{Api, Dice, Ip}
 
   def handle_event({:MESSAGE_CREATE, %{author: %{bot: nil}} = msg, _ws_state}) do
-    IO.inspect(need_evaluate?(msg.content))
+    with {:ok, mentioned?, message_body} <- need_evaluate?(msg.content) do
+      case {get_message_type(message_body), mentioned?} do
+        {:get_global_ip, _} ->
+          Api.create_message(msg.channel_id, Ip.get_global_ip())
 
-    case get_message_type(msg) do
-      :get_global_ip ->
-        Api.create_message(msg.channel_id, Ip.get_global_ip())
+        {{:roll_dice, result}, _} ->
+          Api.create_message(msg.channel_id, generate_dice_roll_message(result, msg))
 
-      {:roll_dice, result} ->
-        Api.create_message(msg.channel_id, generate_dice_roll_message(result, msg))
+        {:other, true} ->
+          # Need to implement this
+          Api.create_message(
+            msg.channel_id,
+            "To Be Implemented. The message will response from LLM"
+          )
 
-      :other ->
-        :ignore
+        {:other, false} ->
+          :ignore
+      end
     end
   end
 
@@ -45,10 +52,10 @@ defmodule DiscordBot.Adapter.EventListener do
     Regex.replace(~r/<@\d+>/, content, "") |> String.trim()
   end
 
-  def get_message_type(%{content: "!ip"}), do: :get_global_ip
+  def get_message_type("!ip"), do: :get_global_ip
 
-  def get_message_type(%{content: content}) do
-    case Dice.capture_dice_roll(content) do
+  def get_message_type(message_body) do
+    case Dice.capture_dice_roll(message_body) do
       result when is_map(result) ->
         {:roll_dice, result}
 
