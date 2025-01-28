@@ -3,7 +3,7 @@ defmodule DiscordBot.Adapter.EventListener do
 
   alias DiscordBot.Adapter.{Api, Ip}
 
-  def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
+  def handle_event({:MESSAGE_CREATE, %{author: %{bot: nil}} = msg, _ws_state}) do
     case msg.content do
       "!ip" ->
         Api.create_message(msg.channel_id, Ip.get_global_ip())
