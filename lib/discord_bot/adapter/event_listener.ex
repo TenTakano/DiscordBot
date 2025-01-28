@@ -13,12 +13,10 @@ defmodule DiscordBot.Adapter.EventListener do
           Api.create_message(msg.channel_id, generate_dice_roll_message(result, msg))
 
         {:other, true} ->
-          # Need to implement this
-          # Api.create_message(
-          #   msg.channel_id,
-          #   "To Be Implemented. The message will response from LLM"
-          # )
-          :to_be_implemented
+          Api.create_message(
+            msg.channel_id,
+            DiscordBot.Adapter.Llm.complete_chat(message_body)
+          )
 
         {:other, false} ->
           :ignore
