@@ -14,10 +14,11 @@ defmodule DiscordBot.Adapter.EventListener do
 
         {:other, true} ->
           # Need to implement this
-          Api.create_message(
-            msg.channel_id,
-            "To Be Implemented. The message will response from LLM"
-          )
+          # Api.create_message(
+          #   msg.channel_id,
+          #   "To Be Implemented. The message will response from LLM"
+          # )
+          :to_be_implemented
 
         {:other, false} ->
           :ignore
