@@ -27,6 +27,11 @@ defmodule DiscordBot.Adapter.EventListenerTest do
         end
       )
     end
+
+    test "returns :error if message contains mention for someone else" do
+      expect(Mock, :get_current_user!, fn -> %{id: "123"} end)
+      assert EventListener.need_evaluate?("<@456> foo") == :error
+    end
   end
 
   describe "get_message_type/1" do
