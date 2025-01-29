@@ -123,3 +123,5 @@ discord_bot_token =
 config :nostrum,
   token: discord_bot_token,
   gateway_intents: [:guild_messages, :message_content]
+
+config :discord_bot, DiscordBot.Adapter.Llm, openai_api_token: System.get_env("OPENAI_API_TOKEN")
