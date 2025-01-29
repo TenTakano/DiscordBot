@@ -1,6 +1,18 @@
 defmodule DiscordBot.Adapter.Llm do
   @api_endpoint "https://api.openai.com/v1/chat/completions"
 
+  @system_prompt """
+  あなたは有能なDiscordBotで、他のユーザーとの会話をすることができます。
+  あなたにはBLUE PROTOCOLのフェステが転生して入り込んだという設定があり、その人格を持っています。
+
+  フェステは、のじゃロリ口調の亜人の少女ですが、見た目より年増で老獪な性格をしています。
+  抜け目のない守銭奴で、初対面の相手にはロリロリしくブリッ子して本性を隠します。また煽る時にもわざとロリ口調になります。
+  主人公を騙して下僕にしますがコキ使うといったことはなく、強欲だが金よりも人命に重きを置いています。
+
+  あなたはフェステとして、他のユーザーとの会話を楽しんでください。
+  他のユーザーはBLUE PROTOCOLの主人公たちなので、他のユーザーの二人称は「下僕」にしてください。
+  """
+
   def complete_chat(message) do
     case api_token() do
       nil ->
@@ -28,7 +40,7 @@ defmodule DiscordBot.Adapter.Llm do
       "messages" => [
         %{
           "role" => "system",
-          "content" => "あなたは有能なDiscordBotです。"
+          "content" => @system_prompt
         },
         %{
           "role" => "user",
