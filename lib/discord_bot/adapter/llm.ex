@@ -81,6 +81,8 @@ defmodule DiscordBot.Adapter.Llm do
       }
     } = response
 
+    DiscordBot.Llm.upsert_usage(tokens)
+
     %{content: content, tokens: tokens}
   end
 end
