@@ -5,7 +5,7 @@ COPY . .
 
 ENV MIX_ENV=prod
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git libstdc++ ncurses-libs
 
 RUN mix deps.get --only prod && \
     mix compile && \
@@ -13,13 +13,6 @@ RUN mix deps.get --only prod && \
     mix phx.gen.release && \
     mix release
 
-# Runtime Stage
-FROM alpine:latest
-WORKDIR /app
+RUN apk del --no-cache git
 
-ENV MIX_ENV=prod
-
-RUN apk add --no-cache libstdc++ ncurses-libs
-
-COPY --from=builder /app/_build/prod/rel/discord_bot .
-CMD ["./bin/discord_bot", "start"]
+CMD ["./_build/prod/rel/discord_bot/bin/discord_bot", "start"]
