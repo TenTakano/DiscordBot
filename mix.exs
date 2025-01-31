@@ -60,7 +60,8 @@ defmodule DiscordBot.MixProject do
       {:bandit, "~> 1.5"},
       {:mox, "~> 1.2"},
       {:nostrum, "~> 0.10"},
-      {:req, "~> 0.5.8"}
+      {:req, "~> 0.5.8"},
+      {:uuidv7, "~> 1.0"}
     ]
   end
 
