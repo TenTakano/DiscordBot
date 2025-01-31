@@ -60,7 +60,8 @@ defmodule DiscordBot.MixProject do
       {:bandit, "~> 1.5"},
       {:mox, "~> 1.2"},
       {:nostrum, "~> 0.10"},
-      {:req, "~> 0.5.8"}
+      {:req, "~> 0.5.8"},
+      {:uuidv7, "~> 1.0"}
     ]
   end
 
@@ -75,7 +76,7 @@ defmodule DiscordBot.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      # test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind discord_bot", "esbuild discord_bot"],
       "assets.deploy": [

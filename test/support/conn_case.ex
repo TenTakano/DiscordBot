@@ -31,8 +31,8 @@ defmodule DiscordBotWeb.ConnCase do
     end
   end
 
-  setup _tags do
-    # DiscordBot.DataCase.setup_sandbox(tags)
+  setup tags do
+    DiscordBot.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

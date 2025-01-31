@@ -11,6 +11,10 @@ config :discord_bot,
   ecto_repos: [DiscordBot.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :discord_bot, DiscordBot.Repo,
+  migration_primary_key: [name: :id, type: :binary_id],
+  migration_foreign_key: [column: :id, type: :binary_id]
+
 # Configures the endpoint
 config :discord_bot, DiscordBotWeb.Endpoint,
   url: [host: "localhost"],
