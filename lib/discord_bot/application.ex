@@ -9,7 +9,7 @@ defmodule DiscordBot.Application do
   def start(_type, _args) do
     children = [
       DiscordBotWeb.Telemetry,
-      # DiscordBot.Repo,
+      DiscordBot.Repo,
       {DNSCluster, query: Application.get_env(:discord_bot, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DiscordBot.PubSub},
       # Start the Finch HTTP client for sending emails
