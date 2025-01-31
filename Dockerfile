@@ -13,6 +13,4 @@ RUN mix deps.get --only prod && \
     mix phx.gen.release && \
     mix release
 
-RUN apk del --no-cache git
-
 CMD ["./_build/prod/rel/discord_bot/bin/discord_bot", "start"]
