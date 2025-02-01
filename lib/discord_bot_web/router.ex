@@ -48,6 +48,6 @@ defmodule DiscordBotWeb.Router do
   scope "/api", DiscordBotWeb do
     pipe_through :api
 
-    post "/v1/llm/report-monthly-cost", LlmController, :report_monthly_cost
+    post "/v1/llm/report-total-cost", LlmController, :report_total_cost
   end
 end

@@ -1,9 +1,9 @@
 defmodule DiscordBotWeb.LlmControllerTest do
   use DiscordBotWeb.ConnCase
 
-  describe "POST /api/v1/llm/report-monthly-cost" do
+  describe "POST /api/v1/llm/report-total-cost" do
     setup %{conn: conn} do
-      [conn: conn, path: "/api/v1/llm/report-monthly-cost"]
+      [conn: conn, path: "/api/v1/llm/report-total-cost"]
     end
 
     test "returns the total tokens and the USD cost", %{conn: conn, path: path} do

@@ -5,7 +5,7 @@ defmodule DiscordBotWeb.LlmController do
 
   @total_cost_per_million_tokens 10
 
-  def report_monthly_cost(conn, params) do
+  def report_total_cost(conn, params) do
     with {:ok, %{reset: reset}} <- validate_params(params) do
       tokens = Llm.get_total_usage()
       usd_cost = Float.ceil(tokens / 1_000_000) * @total_cost_per_million_tokens
