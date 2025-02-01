@@ -1,6 +1,8 @@
 defmodule DiscordBotWeb.Router do
   use DiscordBotWeb, :router
 
+  import DiscordBotWeb.AccountAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -12,6 +14,7 @@ defmodule DiscordBotWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :authenticate_api_token
   end
 
   scope "/", DiscordBotWeb do
