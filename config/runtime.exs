@@ -128,7 +128,7 @@ config :discord_bot, DiscordBot.Adapter.Llm, openai_api_token: System.get_env("O
 
 if config_env() != :test do
   api_token =
-    System.get("API_SECRET_KEY") ||
+    System.get_env("API_SECRET_KEY") ||
       raise "environment variable API_SECRET_KEY is missing."
 
   config :discord_bot, DiscordBotWeb.AccountAuth, api_token: api_token
