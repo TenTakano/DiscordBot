@@ -20,6 +20,19 @@ defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
       assert Validator.validate(data, fields) == {:ok, data}
     end
 
+    test "returns the data with the default values if the keys are missing" do
+      data = %{}
+
+      fields = [
+        {:arg1, :string, []},
+        {:arg2, :integer, [default: 10]},
+        {:arg3, :boolean, [default: true]}
+      ]
+
+      assert Validator.validate(data, fields) ==
+               {:ok, %{arg1: nil, arg2: 10, arg3: true}}
+    end
+
     test "returns the data with the atom keys if the keys are strings" do
       assert Validator.validate(%{"arg" => "value"}, [{:arg, :string, []}]) ==
                {:ok, %{arg: "value"}}
@@ -69,6 +82,48 @@ defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
 
     test "returns an error if the type is invalid" do
       assert Validator.cast_value("value", :invalid) == {:error, :unexpected_type}
+    end
+  end
+
+  describe "validate_constraints/3" do
+    test "returns :ok if there are no constraints" do
+      assert Validator.validate_constraints(:key1, "value", []) == :ok
+    end
+
+    test "returns :ok if the value is within the min and max constraints" do
+      assert Validator.validate_constraints(:key1, 5, [{:min, 0}]) == :ok
+      assert Validator.validate_constraints(:key1, 5, [{:max, 10}]) == :ok
+      assert Validator.validate_constraints(:key1, 5, [{:min, 0}, {:max, 10}]) == :ok
+    end
+
+    test "returns an error if the value is not within the min and max constraints" do
+      assert Validator.validate_constraints(:key1, 5, [{:min, 10}]) ==
+               {:error, :min_constraint_violation, :key1}
+
+      assert Validator.validate_constraints(:key1, 5, [{:max, 0}]) ==
+               {:error, :max_constraint_violation, :key1}
+    end
+
+    test "returns :ok if the value is within the in constraints" do
+      assert Validator.validate_constraints(:key1, "value", [{:in, ["value"]}]) == :ok
+    end
+
+    test "returns an error if the value is not within the in constraints" do
+      assert Validator.validate_constraints(:key1, "value", [{:in, ["invalid"]}]) ==
+               {:error, :in_constraint_violation, :key1}
+    end
+
+    test "returns :ok if the value is required" do
+      assert Validator.validate_constraints(:key1, "value", [{:required, true}]) == :ok
+    end
+
+    test "returns an error if the value is not required" do
+      assert Validator.validate_constraints(:key1, nil, [{:required, true}]) ==
+               {:error, :required_constraint_violation, :key1}
+    end
+
+    test "ignores the unknown constraints" do
+      assert Validator.validate_constraints(:key1, "value", [{:unknown, true}]) == :ok
     end
   end
 

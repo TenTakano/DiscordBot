@@ -98,6 +98,43 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
   def cast_value(_, :boolean), do: {:error, :invalid_boolean}
   def cast_value(_, _), do: {:error, :unexpected_type}
 
+  def validate_constraints(_, _, []), do: :ok
+
+  def validate_constraints(key, value, [{:min, min} | remaining]) when is_number(value) do
+    if value >= min do
+      validate_constraints(key, value, remaining)
+    else
+      {:error, :min_constraint_violation, key}
+    end
+  end
+
+  def validate_constraints(key, value, [{:max, max} | remaining]) when is_number(value) do
+    if value <= max do
+      validate_constraints(key, value, remaining)
+    else
+      {:error, :max_constraint_violation, key}
+    end
+  end
+
+  def validate_constraints(key, value, [{:in, values} | remaining]) do
+    if Enum.member?(values, value) do
+      validate_constraints(key, value, remaining)
+    else
+      {:error, :in_constraint_violation, key}
+    end
+  end
+
+  def validate_constraints(key, value, [{:required, true} | remaining]) do
+    if value do
+      validate_constraints(key, value, remaining)
+    else
+      {:error, :required_constraint_violation, key}
+    end
+  end
+
+  def validate_constraints(key, value, [_ | remaining]),
+    do: validate_constraints(key, value, remaining)
+
   def check_required(data, required_fields) do
     Enum.find_value(required_fields, {:ok, data}, fn field ->
       case Map.fetch(data, field) do
