@@ -5,7 +5,7 @@ COPY . .
 
 ENV MIX_ENV=prod
 
-RUN apk add --no-cache git libstdc++ ncurses-libs
+RUN apk add --no-cache git libstdc++ ncurses-libs curl
 
 RUN mix deps.get --only prod && \
     mix compile && \
