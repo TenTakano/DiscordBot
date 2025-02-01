@@ -41,4 +41,10 @@ defmodule DiscordBotWeb.Router do
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
+
+  scope "/api", DiscordBotWeb do
+    pipe_through :api
+
+    post "/v1/llm/report-monthly-cost", LlmController, :report_monthly_cost
+  end
 end
