@@ -55,21 +55,23 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
 
   def validate(_, _), do: {:error, "Invalid data"}
 
-  defp cast_value(nil, _type), do: {:ok, nil}
-  defp cast_value(value, :integer) when is_integer(value), do: {:ok, value}
+  def cast_value(nil, _type), do: {:ok, nil}
+  def cast_value(value, :integer) when is_integer(value), do: {:ok, value}
 
-  defp cast_value(value, :integer) when is_binary(value) do
+  def cast_value(value, :integer) when is_binary(value) do
     case Integer.parse(value) do
       {int, ""} -> {:ok, int}
       _ -> {:error, :invalid_integer}
     end
   end
 
-  defp cast_value(value, :string) when is_binary(value), do: {:ok, value}
-  defp cast_value(value, :string), do: {:ok, to_string(value)}
-  defp cast_value(value, :boolean) when is_boolean(value), do: {:ok, value}
+  def cast_value(_value, :integer), do: {:error, :invalid_integer}
 
-  defp cast_value(value, :boolean) when is_binary(value) do
+  def cast_value(value, :string) when is_binary(value), do: {:ok, value}
+  def cast_value(value, :string), do: {:ok, to_string(value)}
+  def cast_value(value, :boolean) when is_boolean(value), do: {:ok, value}
+
+  def cast_value(value, :boolean) when is_binary(value) do
     case String.downcase(value) do
       "true" -> {:ok, true}
       "false" -> {:ok, false}
@@ -77,5 +79,6 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
     end
   end
 
-  defp cast_value(_, _), do: {:error, :invalid_type}
+  def cast_value(_, :boolean), do: {:error, :invalid_boolean}
+  def cast_value(_, _), do: {:error, :unexpected_type}
 end

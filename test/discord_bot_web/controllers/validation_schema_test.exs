@@ -30,4 +30,36 @@ defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
       assert {:error, "Invalid data"} = Validator.validate(nil, [])
     end
   end
+
+  describe "cast_value/2" do
+    test "casts an integer" do
+      assert Validator.cast_value(10, :integer) == {:ok, 10}
+      assert Validator.cast_value("10", :integer) == {:ok, 10}
+    end
+
+    test "casts a string" do
+      assert Validator.cast_value("value", :string) == {:ok, "value"}
+    end
+
+    test "casts a boolean" do
+      assert Validator.cast_value("true", :boolean) == {:ok, true}
+      assert Validator.cast_value("false", :boolean) == {:ok, false}
+      assert Validator.cast_value(true, :boolean) == {:ok, true}
+      assert Validator.cast_value(false, :boolean) == {:ok, false}
+    end
+
+    test "returns an error if the value is not a valid integer" do
+      assert Validator.cast_value("invalid", :integer) == {:error, :invalid_integer}
+      assert Validator.cast_value(10.0, :integer) == {:error, :invalid_integer}
+    end
+
+    test "returns an error if the value is not a valid boolean" do
+      assert Validator.cast_value("invalid", :boolean) == {:error, :invalid_boolean}
+      assert Validator.cast_value(10, :boolean) == {:error, :invalid_boolean}
+    end
+
+    test "returns an error if the type is invalid" do
+      assert Validator.cast_value("value", :invalid) == {:error, :unexpected_type}
+    end
+  end
 end
