@@ -50,8 +50,8 @@ end
 
 defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
   def validate(data, fields) when is_map(data) do
-    Enum.reduce_while(fields, {:ok, %{}}, fn {name, type, opts}, {:ok, acc} ->
-      value = Map.get(data, name) || Map.get(data, Atom.to_string(name))
+    Enum.reduce_while(fields, {:ok, %{}}, fn {key, type, opts}, {:ok, acc} ->
+      value = Map.get(data, key) || Map.get(data, Atom.to_string(key))
 
       value =
         case {value, Keyword.fetch(opts, :default)} do
@@ -59,44 +59,45 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
           {v, _} -> v
         end
 
-      with {:ok, casted} <- cast_value(value, type) do
-        name = if is_binary(name), do: String.to_existing_atom(name), else: name
-        {:cont, {:ok, Map.put(acc, name, casted)}}
+      with {:ok, casted} <- cast_value(key, value, type),
+           :ok <- validate_constraints(key, value, opts) do
+        key = if is_binary(key), do: String.to_existing_atom(key), else: key
+        {:cont, {:ok, Map.put(acc, key, casted)}}
       else
-        {:error, reason} ->
-          {:halt, {:error, reason}}
+        error ->
+          {:halt, error}
       end
     end)
   end
 
   def validate(_, _), do: {:error, :invalid_data}
 
-  def cast_value(nil, _type), do: {:ok, nil}
-  def cast_value(value, :integer) when is_integer(value), do: {:ok, value}
+  def cast_value(_key, nil, _type), do: {:ok, nil}
+  def cast_value(_key, value, :integer) when is_integer(value), do: {:ok, value}
 
-  def cast_value(value, :integer) when is_binary(value) do
+  def cast_value(key, value, :integer) when is_binary(value) do
     case Integer.parse(value) do
       {int, ""} -> {:ok, int}
-      _ -> {:error, :invalid_integer}
+      _ -> {:error, :invalid_integer, key}
     end
   end
 
-  def cast_value(_value, :integer), do: {:error, :invalid_integer}
+  def cast_value(key, _value, :integer), do: {:error, :invalid_integer, key}
 
-  def cast_value(value, :string) when is_binary(value), do: {:ok, value}
-  def cast_value(value, :string), do: {:ok, to_string(value)}
-  def cast_value(value, :boolean) when is_boolean(value), do: {:ok, value}
+  def cast_value(_key, value, :string) when is_binary(value), do: {:ok, value}
+  def cast_value(_key, value, :string), do: {:ok, to_string(value)}
+  def cast_value(_key, value, :boolean) when is_boolean(value), do: {:ok, value}
 
-  def cast_value(value, :boolean) when is_binary(value) do
+  def cast_value(key, value, :boolean) when is_binary(value) do
     case String.downcase(value) do
       "true" -> {:ok, true}
       "false" -> {:ok, false}
-      _ -> {:error, :invalid_boolean}
+      _ -> {:error, :invalid_boolean, key}
     end
   end
 
-  def cast_value(_, :boolean), do: {:error, :invalid_boolean}
-  def cast_value(_, _), do: {:error, :unexpected_type}
+  def cast_value(key, _, :boolean), do: {:error, :invalid_boolean, key}
+  def cast_value(key, _, _), do: {:error, :unexpected_type, key}
 
   def validate_constraints(_, _, []), do: :ok
 

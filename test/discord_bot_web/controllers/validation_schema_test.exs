@@ -45,7 +45,7 @@ defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
 
     test "returns an error if the data contains an invalid value" do
       assert Validator.validate(%{"arg" => "invalid"}, [{:arg, :integer, []}]) ==
-               {:error, :invalid_integer}
+               {:error, :invalid_integer, :arg}
     end
 
     test "returns an error if the data is not a map" do
@@ -55,33 +55,33 @@ defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
 
   describe "cast_value/2" do
     test "casts an integer" do
-      assert Validator.cast_value(10, :integer) == {:ok, 10}
-      assert Validator.cast_value("10", :integer) == {:ok, 10}
+      assert Validator.cast_value(:key1, 10, :integer) == {:ok, 10}
+      assert Validator.cast_value(:key1, "10", :integer) == {:ok, 10}
     end
 
     test "casts a string" do
-      assert Validator.cast_value("value", :string) == {:ok, "value"}
+      assert Validator.cast_value(:key1, "value", :string) == {:ok, "value"}
     end
 
     test "casts a boolean" do
-      assert Validator.cast_value("true", :boolean) == {:ok, true}
-      assert Validator.cast_value("false", :boolean) == {:ok, false}
-      assert Validator.cast_value(true, :boolean) == {:ok, true}
-      assert Validator.cast_value(false, :boolean) == {:ok, false}
+      assert Validator.cast_value(:key1, "true", :boolean) == {:ok, true}
+      assert Validator.cast_value(:key1, "false", :boolean) == {:ok, false}
+      assert Validator.cast_value(:key1, true, :boolean) == {:ok, true}
+      assert Validator.cast_value(:key1, false, :boolean) == {:ok, false}
     end
 
     test "returns an error if the value is not a valid integer" do
-      assert Validator.cast_value("invalid", :integer) == {:error, :invalid_integer}
-      assert Validator.cast_value(10.0, :integer) == {:error, :invalid_integer}
+      assert Validator.cast_value(:key1, "invalid", :integer) == {:error, :invalid_integer, :key1}
+      assert Validator.cast_value(:key1, 10.0, :integer) == {:error, :invalid_integer, :key1}
     end
 
     test "returns an error if the value is not a valid boolean" do
-      assert Validator.cast_value("invalid", :boolean) == {:error, :invalid_boolean}
-      assert Validator.cast_value(10, :boolean) == {:error, :invalid_boolean}
+      assert Validator.cast_value(:key1, "invalid", :boolean) == {:error, :invalid_boolean, :key1}
+      assert Validator.cast_value(:key1, 10, :boolean) == {:error, :invalid_boolean, :key1}
     end
 
     test "returns an error if the type is invalid" do
-      assert Validator.cast_value("value", :invalid) == {:error, :unexpected_type}
+      assert Validator.cast_value(:key1, "value", :invalid) == {:error, :unexpected_type, :key1}
     end
   end
 
