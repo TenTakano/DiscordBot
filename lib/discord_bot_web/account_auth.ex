@@ -1,5 +1,6 @@
 defmodule DiscordBotWeb.AccountAuth do
   import Plug.Conn
+  import Phoenix.Controller, only: [json: 2]
 
   if Mix.env() == :test do
     def authenticate_api_token(conn, _opts), do: conn
@@ -15,6 +16,7 @@ defmodule DiscordBotWeb.AccountAuth do
       {:error, _} ->
         conn
         |> put_status(:unauthorized)
+        |> json(%{error: "Authentication failed"})
         |> halt()
     end
   end
