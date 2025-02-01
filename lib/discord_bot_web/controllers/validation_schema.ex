@@ -43,12 +43,39 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
           {v, _} -> v
         end
 
-      casted = value
-
-      name = if is_binary(name), do: String.to_existing_atom(name), else: name
-      {:cont, {:ok, Map.put(acc, name, casted)}}
+      with {:ok, casted} <- cast_value(value, type) do
+        name = if is_binary(name), do: String.to_existing_atom(name), else: name
+        {:cont, {:ok, Map.put(acc, name, casted)}}
+      else
+        {:error, reason} ->
+          {:halt, {:error, reason}}
+      end
     end)
   end
 
   def validate(_, _), do: {:error, "Invalid data"}
+
+  defp cast_value(nil, _type), do: {:ok, nil}
+  defp cast_value(value, :integer) when is_integer(value), do: {:ok, value}
+
+  defp cast_value(value, :integer) when is_binary(value) do
+    case Integer.parse(value) do
+      {int, ""} -> {:ok, int}
+      _ -> {:error, :invalid_integer}
+    end
+  end
+
+  defp cast_value(value, :string) when is_binary(value), do: {:ok, value}
+  defp cast_value(value, :string), do: {:ok, to_string(value)}
+  defp cast_value(value, :boolean) when is_boolean(value), do: {:ok, value}
+
+  defp cast_value(value, :boolean) when is_binary(value) do
+    case String.downcase(value) do
+      "true" -> {:ok, true}
+      "false" -> {:ok, false}
+      _ -> {:error, :invalid_boolean}
+    end
+  end
+
+  defp cast_value(_, _), do: {:error, :invalid_type}
 end
