@@ -2,7 +2,8 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema do
   defmacro __using__(_opts) do
     quote do
       import DiscordBotWeb.Controllers.ValidationSchema
-      Module.register_attribute(__MODULE__, :validation_schema, accumulate: true)
+      Module.register_attribute(__MODULE__, :fields, accumulate: true)
+      Module.register_attribute(__MODULE__, :required_fields, accumulate: true)
       @before_compile DiscordBotWeb.Controllers.ValidationSchema
     end
   end
@@ -19,14 +20,29 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema do
     end
   end
 
+  defmacro required(fields) when is_list(fields) do
+    quote do
+      @required_fields unquote(fields)
+    end
+  end
+
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields) || []
+    required_fields = Module.get_attribute(env.module, :required_fields) || []
 
     quote do
       def __fields__, do: unquote(Macro.escape(fields))
 
+      def __required_fields__, do: unquote(Macro.escape(required_fields))
+
       def validate(data) do
-        DiscordBotWeb.Controllers.ValidationSchema.Validator.validate(data, __fields__())
+        with {:ok, validated} <-
+               DiscordBotWeb.Controllers.ValidationSchema.Validator.validate(data, __fields__()) do
+          DiscordBotWeb.Controllers.ValidationSchema.Validator.check_required(
+            data,
+            __required_fields__()
+          )
+        end
       end
     end
   end
@@ -81,4 +97,19 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
 
   def cast_value(_, :boolean), do: {:error, :invalid_boolean}
   def cast_value(_, _), do: {:error, :unexpected_type}
+
+  def check_required(data, required_fields) do
+    Enum.find_value(required_fields, {:ok, data}, fn field ->
+      case Map.fetch(data, field) do
+        :error ->
+          {:error, :missing_required_field, field}
+
+        {:ok, nil} ->
+          {:error, :missing_required_field, field}
+
+        {:ok, _value} ->
+          false
+      end
+    end)
+  end
 end

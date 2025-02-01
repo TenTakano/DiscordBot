@@ -71,4 +71,37 @@ defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
       assert Validator.cast_value("value", :invalid) == {:error, :unexpected_type}
     end
   end
+
+  describe "check_required/2" do
+    test "returns the data if all required fields are present" do
+      data = %{
+        arg1: "value",
+        arg2: 3,
+        arg3: true
+      }
+
+      assert Validator.check_required(data, [:arg1, :arg2, :arg3]) == {:ok, data}
+    end
+
+    test "returns an error if a required field is missing" do
+      data = %{
+        arg1: "value",
+        arg3: true
+      }
+
+      assert Validator.check_required(data, [:arg1, :arg2, :arg3]) ==
+               {:error, :missing_required_field, :arg2}
+    end
+
+    test "returns an error if a required field is nil" do
+      data = %{
+        arg1: "value",
+        arg2: nil,
+        arg3: true
+      }
+
+      assert Validator.check_required(data, [:arg1, :arg2, :arg3]) ==
+               {:error, :missing_required_field, :arg2}
+    end
+  end
 end
