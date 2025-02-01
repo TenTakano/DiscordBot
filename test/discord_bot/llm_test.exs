@@ -16,4 +16,13 @@ defmodule DiscordBot.LlmTest do
       assert Llm.get_total_usage() == 20
     end
   end
+
+  describe "reset_total_usage/0" do
+    test "resets the total tokens to 0" do
+      Llm.upsert_usage(10)
+
+      assert Llm.reset_total_usage() == :ok
+      assert Llm.get_total_usage() == 0
+    end
+  end
 end
