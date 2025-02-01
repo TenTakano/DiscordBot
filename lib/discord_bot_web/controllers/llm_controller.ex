@@ -15,12 +15,16 @@ defmodule DiscordBotWeb.LlmController do
   end
 
   def report_total_cost(conn, params) do
-    with {:ok, %{reset: reset}} <- Request.validate(params) do
+    with {:ok, validated} <- Request.validate(params) do
       tokens = Llm.get_total_usage()
       usd_cost = Float.ceil(tokens / 1_000_000) * @total_cost_per_million_tokens
 
-      if reset do
+      if validated.reset do
         :ok = Llm.reset_total_usage()
+      end
+
+      if validated.send_notification do
+        DiscordBot.Notifier.send_message("Total tokens: #{tokens}, USD cost: #{usd_cost}")
       end
 
       json(conn, %{tokens: tokens, usd_cost: usd_cost})
