@@ -5,23 +5,32 @@ defmodule DiscordBotWeb.LlmController do
 
   @total_cost_per_million_tokens 10
 
+  defmodule Request do
+    use DiscordBotWeb.Controllers.ValidationSchema
+
+    validation_schema do
+      field :reset, :boolean, default: false
+      field :send_notification, :boolean, default: false
+    end
+  end
+
   def report_total_cost(conn, params) do
-    with {:ok, %{reset: reset}} <- validate_params(params) do
+    with {:ok, validated} <- Request.validate(params) do
       tokens = Llm.get_total_usage()
       usd_cost = Float.ceil(tokens / 1_000_000) * @total_cost_per_million_tokens
 
-      if reset do
+      if validated.reset do
         :ok = Llm.reset_total_usage()
+      end
+
+      if validated.send_notification do
+        DiscordBot.Notifier.send_message("Total tokens: #{tokens}, USD cost: #{usd_cost}")
       end
 
       json(conn, %{tokens: tokens, usd_cost: usd_cost})
     else
-      {:error, :bad_request} ->
+      _error ->
         put_status(conn, :bad_request) |> json(%{error: "Invalid parameters"})
     end
   end
-
-  defp validate_params(%{"reset" => reset}) when is_boolean(reset), do: {:ok, %{reset: reset}}
-  defp validate_params(%{"reset" => _reset}), do: {:error, :bad_request}
-  defp validate_params(_params), do: {:ok, %{reset: false}}
 end
