@@ -53,7 +53,7 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema.Validator do
     end)
   end
 
-  def validate(_, _), do: {:error, "Invalid data"}
+  def validate(_, _), do: {:error, :invalid_data}
 
   def cast_value(nil, _type), do: {:ok, nil}
   def cast_value(value, :integer) when is_integer(value), do: {:ok, value}
