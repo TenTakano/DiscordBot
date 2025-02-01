@@ -24,7 +24,7 @@ defmodule DiscordBot.Llm do
   end
 
   def reset_total_usage() do
-    {1, nil} = Repo.update_all(Usage, set: [total_tokens: 0])
+    {_, nil} = Repo.update_all(Usage, set: [total_tokens: 0])
     :ok
   end
 end
