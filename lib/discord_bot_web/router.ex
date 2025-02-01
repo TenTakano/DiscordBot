@@ -1,6 +1,8 @@
 defmodule DiscordBotWeb.Router do
   use DiscordBotWeb, :router
 
+  import DiscordBotWeb.AccountAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -12,6 +14,7 @@ defmodule DiscordBotWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :authenticate_api_token
   end
 
   scope "/", DiscordBotWeb do
@@ -40,5 +43,11 @@ defmodule DiscordBotWeb.Router do
       live_dashboard "/dashboard", metrics: DiscordBotWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  scope "/api", DiscordBotWeb do
+    pipe_through :api
+
+    post "/v1/llm/report-total-cost", LlmController, :report_total_cost
   end
 end

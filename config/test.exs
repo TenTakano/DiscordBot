@@ -37,3 +37,5 @@ config :phoenix_live_view,
   enable_expensive_runtime_checks: true
 
 config :discord_bot, DiscordBot.Adapter, start_listener: false
+
+config :discord_bot, DiscordBotWeb.AccountAuth, api_token: "valid_token"

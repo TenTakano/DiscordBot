@@ -4,7 +4,12 @@ defmodule DiscordBot.Llm do
   alias DiscordBot.Repo
   alias DiscordBot.Llm.Usage
 
-  def get_total_usage(), do: Repo.one(from u in Usage, select: u.total_tokens)
+  def get_total_usage() do
+    case Repo.one(from u in Usage, select: u.total_tokens) do
+      nil -> 0
+      total_tokens -> total_tokens
+    end
+  end
 
   def upsert_usage(amount) do
     case Repo.one(from(u in Usage)) do
@@ -16,5 +21,10 @@ defmodule DiscordBot.Llm do
         Repo.update_all(Usage, inc: [total_tokens: amount])
         usage.total_tokens + amount
     end
+  end
+
+  def reset_total_usage() do
+    {_, nil} = Repo.update_all(Usage, set: [total_tokens: 0])
+    :ok
   end
 end
