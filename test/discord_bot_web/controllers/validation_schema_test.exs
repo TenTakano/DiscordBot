@@ -1,3 +1,29 @@
+defmodule DiscordBot.Controllers.ValidationSchemaTest do
+  use ExUnit.Case, async: true
+
+  defmodule Test do
+    use DiscordBotWeb.Controllers.ValidationSchema
+
+    validation_schema do
+      field :arg1, :string
+      field :arg2, :integer
+      field :arg3, :boolean
+
+      required([:arg1, :arg2, :arg3])
+    end
+  end
+
+  test "returns the data if it is valid" do
+    data = %{
+      arg1: "value",
+      arg2: 3,
+      arg3: true
+    }
+
+    assert Test.validate(data) == {:ok, data}
+  end
+end
+
 defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do
   use ExUnit.Case, async: true
 

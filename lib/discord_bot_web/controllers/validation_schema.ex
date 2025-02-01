@@ -3,7 +3,7 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema do
     quote do
       import DiscordBotWeb.Controllers.ValidationSchema
       Module.register_attribute(__MODULE__, :fields, accumulate: true)
-      Module.register_attribute(__MODULE__, :required_fields, accumulate: true)
+      Module.register_attribute(__MODULE__, :required_fields, accumulate: false)
       @before_compile DiscordBotWeb.Controllers.ValidationSchema
     end
   end
