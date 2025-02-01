@@ -126,6 +126,8 @@ config :nostrum,
 
 config :discord_bot, DiscordBot.Adapter.Llm, openai_api_token: System.get_env("OPENAI_API_TOKEN")
 
+config :discord_bot, DiscordBot.Notifier, webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
+
 if config_env() != :test do
   api_token =
     System.get_env("API_SECRET_KEY") ||
