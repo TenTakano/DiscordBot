@@ -8,7 +8,8 @@ defmodule DiscordBotWeb.AccountAuth do
   end
 
   def authenticate_api_token_impl(conn) do
-    with {:ok, _token} <- fetch_token(conn) do
+    with {:ok, token} <- fetch_token(conn),
+         :ok <- validate_token(token) do
       conn
     else
       {:error, _} ->
@@ -32,4 +33,12 @@ defmodule DiscordBotWeb.AccountAuth do
   end
 
   defp fetch_token(_conn), do: {:error, :no_token}
+
+  defp validate_token(token) do
+    if token == api_token(), do: :ok, else: {:error, :invalid_token}
+  end
+
+  defp api_token() do
+    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:api_token)
+  end
 end

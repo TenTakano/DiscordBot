@@ -125,3 +125,11 @@ config :nostrum,
   gateway_intents: [:guild_messages, :message_content]
 
 config :discord_bot, DiscordBot.Adapter.Llm, openai_api_token: System.get_env("OPENAI_API_TOKEN")
+
+if config_env() != :test do
+  api_token =
+    System.get("API_SECRET_KEY") ||
+      raise "environment variable API_SECRET_KEY is missing."
+
+  config :discord_bot, DiscordBotWeb.AccountAuth, api_token: api_token
+end
