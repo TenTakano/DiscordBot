@@ -25,7 +25,7 @@ defmodule DiscordBotWeb.LlmControllerTest do
     end
 
     test "returns an error if the reset parameter is not a boolean", %{conn: conn, path: path} do
-      conn = post(conn, path, %{reset: "true"})
+      conn = post(conn, path, %{reset: 1})
       assert json_response(conn, 400) == %{"error" => "Invalid parameters"}
     end
   end

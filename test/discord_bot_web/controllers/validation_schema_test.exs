@@ -22,6 +22,16 @@ defmodule DiscordBot.Controllers.ValidationSchemaTest do
 
     assert Test.validate(data) == {:ok, data}
   end
+
+  test "returns the data with converting string key to atom key" do
+    data = %{
+      "arg1" => "value",
+      "arg2" => 3,
+      "arg3" => true
+    }
+
+    assert Test.validate(data) == {:ok, %{arg1: "value", arg2: 3, arg3: true}}
+  end
 end
 
 defmodule DiscordWeb.Controllers.ValidationSchema.ValidatorTest do

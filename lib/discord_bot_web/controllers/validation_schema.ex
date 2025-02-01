@@ -39,7 +39,7 @@ defmodule DiscordBotWeb.Controllers.ValidationSchema do
         with {:ok, validated} <-
                DiscordBotWeb.Controllers.ValidationSchema.Validator.validate(data, __fields__()) do
           DiscordBotWeb.Controllers.ValidationSchema.Validator.check_required(
-            data,
+            validated,
             __required_fields__()
           )
         end
