@@ -2,7 +2,14 @@ defmodule DiscordBot.Llm do
   import Ecto.Query
 
   alias DiscordBot.Repo
-  alias DiscordBot.Llm.Usage
+  alias DiscordBot.Llm.{OpenAIClient, Usage}
+
+  def chat_with_model(message) do
+    result = OpenAIClient.chat_with_model(message)
+    upsert_usage(result.tokens)
+
+    result
+  end
 
   def get_total_usage() do
     case Repo.one(from u in Usage, select: u.total_tokens) do

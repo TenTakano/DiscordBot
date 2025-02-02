@@ -124,7 +124,8 @@ config :nostrum,
   token: discord_bot_token,
   gateway_intents: [:guild_messages, :message_content]
 
-config :discord_bot, DiscordBot.Adapter.Llm, openai_api_token: System.get_env("OPENAI_API_TOKEN")
+config :discord_bot, DiscordBot.Llm.OpenAIClient,
+  openai_api_token: System.get_env("OPENAI_API_TOKEN")
 
 config :discord_bot, DiscordBot.Notifier, webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
 
