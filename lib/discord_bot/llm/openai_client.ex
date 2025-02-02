@@ -4,7 +4,7 @@ defmodule DiscordBot.Llm.OpenAIClient do
   @chat_model "gpt-4o"
   @chat_endpoint "https://api.openai.com/v1/chat/completions"
 
-  def chat_with_model(history, opts \\ []) do
+  def ask_model(history, opts \\ []) do
     body = %{
       "model" => @chat_model,
       "messages" => history

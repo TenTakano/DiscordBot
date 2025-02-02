@@ -18,7 +18,7 @@ defmodule DiscordBot.Llm do
 
     tools = get_tool_functions() |> Enum.map(& &1.definition)
 
-    case OpenAIClient.chat_with_model(history, tools: tools) do
+    case OpenAIClient.ask_model(history, tools: tools) do
       {:stop, message, usage} ->
         upsert_usage(usage["total_tokens"])
         %{content: message["content"], total_tokens: usage["total_tokens"]}
@@ -37,7 +37,7 @@ defmodule DiscordBot.Llm do
               }
             ]
 
-        {:stop, message, usage} = OpenAIClient.chat_with_model(history, tools: tools)
+        {:stop, message, usage} = OpenAIClient.ask_model(history, tools: tools)
         upsert_usage(usage["total_tokens"])
         %{content: message["content"], total_tokens: usage["total_tokens"]}
     end
