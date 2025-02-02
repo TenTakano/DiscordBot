@@ -2,20 +2,10 @@ defmodule DiscordBot.Llm do
   import Ecto.Query
 
   alias DiscordBot.Repo
-  alias DiscordBot.Llm.{OpenAIClient, Prompts, ToolFunction, Usage}
+  alias DiscordBot.Llm.{History, OpenAIClient, ToolFunction, Usage}
 
   def chat_with_model(message) do
-    history = [
-      %{
-        "role" => "system",
-        "content" => Prompts.system_prompt()
-      },
-      %{
-        "role" => "user",
-        "content" => message
-      }
-    ]
-
+    history = History.generate_initial_history(message)
     tools = get_tool_functions() |> Enum.map(& &1.definition)
 
     case OpenAIClient.ask_model(history, tools: tools) do
@@ -27,15 +17,14 @@ defmodule DiscordBot.Llm do
         upsert_usage(usage["total_tokens"])
 
         history =
-          history ++
-            [
-              message,
-              %{
-                "role" => "tool",
-                "tool_call_id" => hd(message["tool_calls"])["id"],
-                "content" => "134.7.25.83"
-              }
-            ]
+          Enum.reduce(
+            message["tool_calls"],
+            History.append_tool_call(history, message),
+            fn tool_call, acc ->
+              result = "134.7.25.83"
+              History.append_tool_result(acc, tool_call["id"], result)
+            end
+          )
 
         {:stop, message, usage} = OpenAIClient.ask_model(history, tools: tools)
         upsert_usage(usage["total_tokens"])
