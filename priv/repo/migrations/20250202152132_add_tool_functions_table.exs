@@ -9,5 +9,7 @@ defmodule DiscordBot.Repo.Migrations.AddToolFunctionsTable do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:tool_functions, [:name])
   end
 end
