@@ -1,26 +1,21 @@
 defmodule DiscordBot.Llm.OpenAIClient do
   alias DiscordBot.HttpClient
-  alias DiscordBot.Llm.Prompts
 
   @chat_model "gpt-4o"
   @chat_endpoint "https://api.openai.com/v1/chat/completions"
 
-  def chat_with_model(message) do
+  def chat_with_model(history, opts \\ []) do
     body = %{
       "model" => @chat_model,
-      "messages" => [
-        %{
-          "role" => "system",
-          "content" => Prompts.system_prompt()
-        },
-        %{
-          "role" => "user",
-          "content" => message
-        }
-      ]
+      "messages" => history
     }
 
-    request!(@chat_endpoint, body) |> extract_response()
+    body =
+      Enum.into(opts, body, fn {key, value} ->
+        {Atom.to_string(key), value}
+      end)
+
+    request!(@chat_endpoint, body) |> handle_response()
   end
 
   defp request!(url, body) do
@@ -38,12 +33,11 @@ defmodule DiscordBot.Llm.OpenAIClient do
     Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_api_token)
   end
 
-  defp extract_response(%{status: 200, body: body}) do
-    %{
-      "choices" => [%{"message" => %{"content" => content}}],
-      "usage" => %{"total_tokens" => tokens}
-    } = body
-
-    %{content: content, tokens: tokens}
+  defp handle_response(%{status: 200, body: %{"choices" => [choice], "usage" => usage}}) do
+    {
+      String.to_existing_atom(choice["finish_reason"]),
+      choice["message"],
+      usage
+    }
   end
 end

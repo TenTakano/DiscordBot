@@ -2,13 +2,45 @@ defmodule DiscordBot.Llm do
   import Ecto.Query
 
   alias DiscordBot.Repo
-  alias DiscordBot.Llm.{OpenAIClient, ToolFunction, Usage}
+  alias DiscordBot.Llm.{OpenAIClient, Prompts, ToolFunction, Usage}
 
   def chat_with_model(message) do
-    result = OpenAIClient.chat_with_model(message)
-    upsert_usage(result.tokens)
+    history = [
+      %{
+        "role" => "system",
+        "content" => Prompts.system_prompt()
+      },
+      %{
+        "role" => "user",
+        "content" => message
+      }
+    ]
 
-    result
+    tools = get_tool_functions() |> Enum.map(& &1.definition)
+
+    case OpenAIClient.chat_with_model(history, tools: tools) do
+      {:stop, message, usage} ->
+        upsert_usage(usage["total_tokens"])
+        %{content: message["content"], total_tokens: usage["total_tokens"]}
+
+      {:tool_calls, message, usage} ->
+        upsert_usage(usage["total_tokens"])
+
+        history =
+          history ++
+            [
+              message,
+              %{
+                "role" => "tool",
+                "tool_call_id" => hd(message["tool_calls"])["id"],
+                "content" => "134.7.25.83"
+              }
+            ]
+
+        {:stop, message, usage} = OpenAIClient.chat_with_model(history, tools: tools)
+        upsert_usage(usage["total_tokens"])
+        %{content: message["content"], total_tokens: usage["total_tokens"]}
+    end
   end
 
   def get_total_usage() do
