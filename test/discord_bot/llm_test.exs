@@ -35,7 +35,7 @@ defmodule DiscordBot.LlmTest do
         })
 
       assert tool_function.name == "test"
-      assert tool_function.definition == Jason.encode!(%{key: "value"})
+      assert tool_function.definition == %{key: "value"}
       assert tool_function.is_enabled == true
     end
 
@@ -68,7 +68,7 @@ defmodule DiscordBot.LlmTest do
       tool_function =
         Llm.create_tool_function!(%{
           name: "test",
-          definition: %{key: "value"}
+          definition: %{"key" => "value"}
         })
 
       Llm.create_tool_function!(%{
