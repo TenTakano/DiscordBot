@@ -15,7 +15,7 @@ defmodule DiscordBot.Adapter.EventListener do
         {:other, true} ->
           Api.create_message(
             msg.channel_id,
-            DiscordBot.Adapter.Llm.complete_chat(message_body)
+            DiscordBot.Llm.chat_with_model(message_body)
           )
 
         {:other, false} ->
