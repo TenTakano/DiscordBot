@@ -6,13 +6,14 @@ defmodule DiscordBot.Llm do
 
   def chat_with_model(message) do
     history = History.generate_initial_history(message)
-    tools = get_tool_functions() |> Enum.map(& &1.definition)
+    tools = get_tool_functions()
 
     chat_with_model_repeatedly(history, tools)
   end
 
   defp chat_with_model_repeatedly(history, tools) do
-    {reason, message, usage} = OpenAIClient.ask_model(history, tools: tools)
+    tool_definitions = Enum.map(tools, & &1.definition)
+    {reason, message, usage} = OpenAIClient.ask_model(history, tools: tool_definitions)
     upsert_usage(usage["total_tokens"])
 
     case {reason, message} do
@@ -24,16 +25,23 @@ defmodule DiscordBot.Llm do
           Enum.reduce(
             message["tool_calls"],
             History.append_tool_call(history, message),
-            &execute_tool_function/2
+            &execute_tool_function(&1, &2, tools)
           )
 
         chat_with_model_repeatedly(history, tools)
     end
   end
 
-  defp execute_tool_function(tool_call, history) do
-    tool_result = "134.7.25.83"
-    History.append_tool_result(history, tool_call["id"], tool_result)
+  # TODO: Need to update for using arguments
+  defp execute_tool_function(tool_call, history, tools) do
+    %{name: serialized} =
+      Enum.find(tools, fn %{definition: definition} ->
+        definition["function"]["name"] == tool_call["function"]["name"]
+      end)
+
+    {mod, fun} = Base.decode64!(serialized) |> :erlang.binary_to_term()
+    result = apply(mod, fun, [])
+    History.append_tool_result(history, tool_call["id"], result)
   end
 
   def get_total_usage() do

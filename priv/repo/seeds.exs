@@ -13,26 +13,29 @@
 alias DiscordBot.Repo
 
 tool_function_definitions = [
-  get_global_ip: %{
-    type: "function",
-    function: %{
-      name: "get_global_ip",
-      description: "Get the global IP address of the server.",
-      parameters: %{
-        type: "object",
-        properties: %{},
-        required: [],
-        additionalProperties: false
-      },
-      strict: true
-    }
-  }
+  {DiscordBot.Adapter.Ip, :get_global_ip,
+   %{
+     type: "function",
+     function: %{
+       name: "get_global_ip",
+       description: "Get the global IP address of the server.",
+       parameters: %{
+         type: "object",
+         properties: %{},
+         required: [],
+         additionalProperties: false
+       },
+       strict: true
+     }
+   }}
 ]
 
-Enum.each(tool_function_definitions, fn {name, definition} ->
+Enum.each(tool_function_definitions, fn {mod, fun, definition} ->
+  serialized = :erlang.term_to_binary({mod, fun}) |> Base.encode64()
+
   Repo.insert(
     %DiscordBot.Llm.ToolFunction{
-      name: Atom.to_string(name),
+      name: serialized,
       definition: definition
     },
     on_conflict: [set: [definition: definition]],
