@@ -25,4 +25,22 @@ defmodule DiscordBot.LlmTest do
       assert Llm.get_total_usage() == 0
     end
   end
+
+  describe "get_tool_functions/0" do
+    test "returns tool functions whose is_enabled is true" do
+      tool_function =
+        Llm.create_tool_function!(%{
+          name: "test",
+          definition: "test definition"
+        })
+
+      Llm.create_tool_function!(%{
+        name: "test2",
+        definition: "test definition",
+        is_enabled: false
+      })
+
+      assert Llm.get_tool_functions() == [tool_function]
+    end
+  end
 end

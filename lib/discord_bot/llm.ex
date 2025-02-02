@@ -2,7 +2,7 @@ defmodule DiscordBot.Llm do
   import Ecto.Query
 
   alias DiscordBot.Repo
-  alias DiscordBot.Llm.{OpenAIClient, Usage}
+  alias DiscordBot.Llm.{OpenAIClient, ToolFunction, Usage}
 
   def chat_with_model(message) do
     result = OpenAIClient.chat_with_model(message)
@@ -33,5 +33,15 @@ defmodule DiscordBot.Llm do
   def reset_total_usage() do
     {_, nil} = Repo.update_all(Usage, set: [total_tokens: 0])
     :ok
+  end
+
+  def create_tool_function!(params) do
+    %ToolFunction{}
+    |> ToolFunction.changeset(params)
+    |> Repo.insert!()
+  end
+
+  def get_tool_functions() do
+    Repo.all(from tf in ToolFunction, where: tf.is_enabled)
   end
 end
