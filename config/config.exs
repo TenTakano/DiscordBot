@@ -67,7 +67,7 @@ config :phoenix, :json_library, Jason
 
 config :discord_bot, DiscordBot.Adapter, start_listener: true
 
-config :discord_bot, DiscordBot.RandomUtil, DiscordBot.RandomUtil.Impl
+config :discord_bot, DiscordBot.RandomUtil, module: DiscordBot.RandomUtil.Impl
 config :discord_bot, DiscordBot.Adapter.Api, module: DiscordBot.Adapter.Api.Impl
 config :discord_bot, DiscordBot.HttpClient, module: DiscordBot.HttpClient.Impl
 

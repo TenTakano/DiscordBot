@@ -15,6 +15,6 @@ defmodule DiscordBot.RandomUtil do
   def random(max), do: random_impl().random(max)
 
   defp random_impl() do
-    Application.get_env(:discord_bot, __MODULE__)
+    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:module)
   end
 end
