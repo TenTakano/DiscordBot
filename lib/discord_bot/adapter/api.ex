@@ -35,6 +35,6 @@ defmodule DiscordBot.Adapter.Api do
   def start_typing!(channel_id), do: api_impl().start_typing!(channel_id)
 
   defp api_impl() do
-    Application.get_env(:discord_bot, __MODULE__)
+    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:module)
   end
 end
