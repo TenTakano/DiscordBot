@@ -11,7 +11,17 @@
 # and so on) as they will fail if something goes wrong.
 
 {:ok, _} = Application.ensure_all_started(:ecto_sql)
-{:ok, _} = DiscordBot.Repo.start_link()
+
+case DiscordBot.Repo.start_link() do
+  {:ok, _pid} ->
+    :ok
+
+  {:error, {:already_started, _pid}} ->
+    :ok
+
+  {:error, reason} ->
+    raise "Repo failed to start: #{inspect(reason)}"
+end
 
 alias DiscordBot.Repo
 
