@@ -13,6 +13,8 @@ defmodule DiscordBot.Adapter.EventListener do
           Api.create_message(msg.channel_id, generate_dice_roll_message(result, msg))
 
         {:other, true} ->
+          Api.start_typing!(msg.channel_id)
+
           Api.create_message(
             msg.channel_id,
             DiscordBot.Llm.chat_with_model(message_body)
