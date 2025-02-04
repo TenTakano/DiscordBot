@@ -55,3 +55,4 @@ $ docker run -e DISCORD_BOT_TOKEN={discord botのTOKEN} -e OPEN_API_TOKEN={Open 
 3. `Bot` タブをクリックしてボットの設定画面を表示
 4. `MESSAGE CONTENT INTENT` を有効にする
 4. `Reset Token` をクリックして新しくトークンを生成
+
