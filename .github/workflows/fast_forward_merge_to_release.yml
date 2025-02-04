@@ -1,0 +1,72 @@
+name: Fast-Forward Merge from master to release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch (for dev environment)'
+        required: true
+        default: 'master'
+      target_branch:
+        description: 'Target branch (for prod environment)'
+        required: true
+        default: 'release'
+
+jobs:
+  pre-merge-check:
+    name: Pre-merge Check
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: discord_bot_test
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout Source Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.source_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Dockerfile
+        run: docker build -t discord_bot:latest .
+
+      - name: Run Mix Test in Docker Container
+        run: docker run --rm discord_bot:latest mix test
+
+  ff-merge:
+    name: Fast-Forward Merge for Prod Deployment
+    runs-on: ubuntu-latest
+    needs: pre-merge-check
+    steps:
+      - name: Checkout Target Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Fetch Source Branch
+        run: git fetch origin ${{ github.event.inputs.source_branch }}
+
+      - name: Fast-Forward Merge
+        run: git merge --ff-only origin/${{ github.event.inputs.source_branch }}
+
+      - name: Push Changes
+        run: git push origin ${{ github.event.inputs.target_branch }}
+
+  notify-failure:
+    name: Notify Failure
+    needs: pre-merge-check
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify to Discord
+        run: |
+          MESSAGE=$'デプロイ前チェックに失敗したためデプロイを中止しました'
+          JSON=$(jq -n --arg msg "$MESSAGE" '{content: $msg}')
+          curl -X POST -H "Content-Type: application/json" -d "$JSON" ${{ secrets.DISCORD_ALERT_WEBHOOK_URL }}
