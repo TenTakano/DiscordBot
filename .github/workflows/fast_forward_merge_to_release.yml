@@ -67,6 +67,7 @@ jobs:
     steps:
       - name: Notify to Discord
         run: |
-          MESSAGE=$'デプロイ前チェックに失敗したためデプロイを中止しました'
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          MESSAGE=$'Failed to merge from master to release branch due to pre-merge check failure. [${REPO_NAME}]'
           JSON=$(jq -n --arg msg "$MESSAGE" '{content: $msg}')
           curl -X POST -H "Content-Type: application/json" -d "$JSON" ${{ secrets.DISCORD_ALERT_WEBHOOK_URL }}
