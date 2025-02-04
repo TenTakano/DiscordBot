@@ -1,5 +1,8 @@
 name: Fast-Forward Merge from master to release
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
