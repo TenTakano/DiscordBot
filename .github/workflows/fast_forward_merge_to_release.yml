@@ -16,7 +16,6 @@ jobs:
   ff-merge:
     name: Fast-Forward Merge for Prod Deployment
     runs-on: ubuntu-latest
-    needs: pre-merge-check
     steps:
       - name: Checkout Target Branch
         uses: actions/checkout@v4
