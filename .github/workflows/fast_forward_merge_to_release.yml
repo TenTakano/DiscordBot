@@ -36,7 +36,7 @@ jobs:
         run: docker build -t discord_bot:latest .
 
       - name: Run Mix Test in Docker Container
-        run: docker run --rm discord_bot:latest mix test
+        run: docker run --rm -e MIX_ENV=test discord_bot:latest mix test
 
   ff-merge:
     name: Fast-Forward Merge for Prod Deployment
