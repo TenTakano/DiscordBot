@@ -116,23 +116,23 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
 
-discord_bot_token =
-  System.get_env("DISCORD_BOT_TOKEN") ||
-    raise "environment variable DISCORD_BOT_TOKEN is missing."
-
-config :nostrum,
-  token: discord_bot_token,
-  gateway_intents: [:guild_messages, :message_content]
-
-config :discord_bot, DiscordBot.Llm.OpenAIClient,
-  openai_api_token: System.get_env("OPENAI_API_TOKEN")
-
-config :discord_bot, DiscordBot.Notifier, webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
-
 if config_env() != :test do
   api_token =
     System.get_env("API_SECRET_KEY") ||
       raise "environment variable API_SECRET_KEY is missing."
 
   config :discord_bot, DiscordBotWeb.AccountAuth, api_token: api_token
+
+  discord_bot_token =
+    System.get_env("DISCORD_BOT_TOKEN") ||
+      raise "environment variable DISCORD_BOT_TOKEN is missing."
+
+  config :nostrum,
+    token: discord_bot_token,
+    gateway_intents: [:guild_messages, :message_content]
 end
+
+config :discord_bot, DiscordBot.Llm.OpenAIClient,
+  openai_api_token: System.get_env("OPENAI_API_TOKEN")
+
+config :discord_bot, DiscordBot.Notifier, webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
