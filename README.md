@@ -45,3 +45,13 @@ $ docker run -e DISCORD_BOT_TOKEN={discord botのTOKEN} -e OPEN_API_TOKEN={Open 
   - OPEN_API_TOKEN
     - メンションを利用した会話機能を利用する場合には必須
     - OpenAI APIのトークンです。OpenAIのサイトから取得してください。
+
+## Discordトークンの取得
+
+以下の手順でコピーしたトークンを `DISCORD_BOT_TOKEN` として利用してください。
+
+1. [Discord Developer Portal](https://discord.com/developers/applications)にアクセスしてログイン
+2. `New Application` をクリックしてアプリケーションを作成
+3. `Bot` タブをクリックしてボットの設定画面を表示
+4. `MESSAGE CONTENT INTENT` を有効にする
+4. `Reset Token` をクリックして新しくトークンを生成
