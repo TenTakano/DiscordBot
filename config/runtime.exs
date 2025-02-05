@@ -136,3 +136,9 @@ config :discord_bot, DiscordBot.Llm.OpenAIClient,
   openai_api_token: System.get_env("OPENAI_API_TOKEN")
 
 config :discord_bot, DiscordBot.Notifier, webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
+
+config :ueberauth, Ueberauth.Strategy.Discord.OAuth,
+  client_id: System.get_env("DISCORD_CLIENT_ID"),
+  client_secret: System.get_env("DISCORD_CLIENT_SECRET"),
+  # TODO: Fix this
+  redirect_uri: "http://localhost:4000/auth/discord/callback"

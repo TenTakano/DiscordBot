@@ -71,6 +71,11 @@ config :discord_bot, DiscordBot.RandomUtil, module: DiscordBot.RandomUtil.Impl
 config :discord_bot, DiscordBot.Adapter.Api, module: DiscordBot.Adapter.Api.Impl
 config :discord_bot, DiscordBot.HttpClient, module: DiscordBot.HttpClient.Impl
 
+config :ueberauth, Ueberauth,
+  providers: [
+    discord: {Ueberauth.Strategy.Discord, []}
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
