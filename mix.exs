@@ -61,7 +61,9 @@ defmodule DiscordBot.MixProject do
       {:mox, "~> 1.2"},
       {:nostrum, "~> 0.10", runtime: Mix.env() != :test},
       {:req, "~> 0.5.8"},
-      {:uuidv7, "~> 1.0"}
+      {:uuidv7, "~> 1.0"},
+      {:ueberauth, "~> 0.10.8"},
+      {:ueberauth_discord, "~> 0.7.0"}
     ]
   end
 
