@@ -6,16 +6,15 @@ defmodule DiscordBot.Accounts.Account do
     field :provider, :string
     field :name, :string
     field :avatar, :string
-    field :token, :string
-    field :refresh_token, :string
-    field :expires_at, :utc_datetime
+
+    has_many :account_auths, DiscordBot.Accounts.AccountAuth
 
     timestamps(type: :utc_datetime)
   end
 
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:uid, :provider, :name, :avatar, :token, :refresh_token, :expires_at])
+    |> cast(attrs, [:uid, :provider, :name, :avatar])
     |> validate_required([:uid, :provider])
     |> unique_constraint([:uid, :provider])
   end

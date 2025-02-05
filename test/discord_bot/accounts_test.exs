@@ -20,28 +20,26 @@ defmodule DiscordBot.AccountsTest do
 
     test "creates a new account", %{account_params: account_params} do
       assert {:ok, account} = Accounts.find_or_create_account(account_params)
-
-      assert account.uid == "123"
-      assert account.provider == "discord"
-      assert account.name == "John Doe"
-      assert account.avatar == "https://example.com/avatar.png"
-      assert account.token == "token"
-      assert account.refresh_token == "refresh_token"
-      assert account.expires_at == ~U[2025-01-18T13:02:00Z]
+      assert_account_resources(account)
     end
 
     test "finds an existing account", %{account_params: account_params} do
       assert {:ok, _account} = Accounts.find_or_create_account(account_params)
 
       assert {:ok, account} = Accounts.find_or_create_account(account_params)
+      assert_account_resources(account)
+    end
 
+    defp assert_account_resources(account) do
       assert account.uid == "123"
       assert account.provider == "discord"
       assert account.name == "John Doe"
       assert account.avatar == "https://example.com/avatar.png"
-      assert account.token == "token"
-      assert account.refresh_token == "refresh_token"
-      assert account.expires_at == ~U[2025-01-18T13:02:00Z]
+
+      assert [auth] = Accounts.list_account_auth(account.id)
+      assert auth.token == "token"
+      assert auth.refresh_token == "refresh_token"
+      assert auth.expires_at == ~U[2025-01-18T13:02:00Z]
     end
   end
 end
