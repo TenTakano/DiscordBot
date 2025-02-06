@@ -1,4 +1,4 @@
-defmodule DiscordBot.Accounts.AccountAuth do
+defmodule DiscordBot.Accounts.OAuthToken do
   use DiscordBot.Schema
 
   schema "account_auths" do
