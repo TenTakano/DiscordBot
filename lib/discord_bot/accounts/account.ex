@@ -7,7 +7,7 @@ defmodule DiscordBot.Accounts.Account do
     field :name, :string
     field :avatar, :string
 
-    has_many :account_auths, DiscordBot.Accounts.AccountAuth
+    has_many :account_auths, DiscordBot.Accounts.OAuthToken
 
     timestamps(type: :utc_datetime)
   end

@@ -1,7 +1,7 @@
-defmodule DiscordBot.Accounts.AccountAuth do
+defmodule DiscordBot.Accounts.OAuthToken do
   use DiscordBot.Schema
 
-  schema "account_auths" do
+  schema "oauth_tokens" do
     field :token, :string
     field :refresh_token, :string
     field :expires_at, :utc_datetime

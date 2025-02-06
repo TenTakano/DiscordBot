@@ -2,7 +2,7 @@ defmodule DiscordBot.Accounts do
   import Ecto.Query
 
   alias DiscordBot.Repo
-  alias DiscordBot.Accounts.{Account, AccountAuth}
+  alias DiscordBot.Accounts.{Account, OAuthToken}
 
   def find_or_create_account(account_params) do
     case Repo.get_by(Account, provider: account_params.provider, uid: account_params.uid) do
@@ -25,12 +25,12 @@ defmodule DiscordBot.Accounts do
   end
 
   def create_account_auth(account_auth_params) do
-    %AccountAuth{}
-    |> AccountAuth.changeset(account_auth_params)
+    %OAuthToken{}
+    |> OAuthToken.changeset(account_auth_params)
     |> Repo.insert()
   end
 
   def list_account_auth(account_id) do
-    Repo.all(from a in AccountAuth, where: a.account_id == ^account_id)
+    Repo.all(from o in OAuthToken, where: o.account_id == ^account_id)
   end
 end
