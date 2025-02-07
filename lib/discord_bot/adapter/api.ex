@@ -13,17 +13,18 @@ defmodule DiscordBot.Adapter.Api.Impl do
 
   @impl DiscordBot.Adapter.Api.Behaviour
   def create_message(channel_id, content) do
-    Nostrum.Api.create_message(channel_id, content)
+    Nostrum.Api.Message.create(channel_id, content)
   end
 
   @impl DiscordBot.Adapter.Api.Behaviour
   def get_current_user!() do
-    Nostrum.Api.get_current_user!()
+    {:ok, user} = Nostrum.Api.Self.get()
+    user
   end
 
   @impl DiscordBot.Adapter.Api.Behaviour
   def start_typing!(channel_id) do
-    Nostrum.Api.start_typing(channel_id)
+    Nostrum.Api.Channel.start_typing(channel_id)
   end
 end
 
