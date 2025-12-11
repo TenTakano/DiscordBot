@@ -9,6 +9,23 @@ defmodule DiscordBot.Release do
     end
   end
 
+  def create_and_migrate do
+    load_app()
+
+    for repo <- repos() do
+      create_database(repo)
+      {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
+    end
+  end
+
+  defp create_database(repo) do
+    case repo.__adapter__().storage_up(repo.config()) do
+      :ok -> :ok
+      {:error, :already_up} -> :ok
+      {:error, term} -> {:error, term}
+    end
+  end
+
   def rollback(repo, version) do
     load_app()
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))

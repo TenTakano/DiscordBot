@@ -2,4 +2,4 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
-exec ./discord_bot eval DiscordBot.Release.migrate
+exec ./discord_bot eval DiscordBot.Release.create_and_migrate
