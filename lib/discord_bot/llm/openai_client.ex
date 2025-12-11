@@ -1,21 +1,17 @@
 defmodule DiscordBot.Llm.OpenAIClient do
   alias DiscordBot.HttpClient
 
-  @chat_model "gpt-4o"
-  @chat_endpoint "https://api.openai.com/v1/chat/completions"
+  @endpoint "https://api.openai.com/v1/responses"
 
-  def ask_model(history, opts \\ []) do
-    body = %{
-      "model" => @chat_model,
-      "messages" => history
-    }
+  def ask_model(input, opts \\ []) do
+    body = %{"model" => model(), "input" => input}
 
     body =
       Enum.into(opts, body, fn {key, value} ->
         {Atom.to_string(key), value}
       end)
 
-    request!(@chat_endpoint, body) |> handle_response()
+    request!(@endpoint, body) |> handle_response()
   end
 
   defp request!(url, body) do
@@ -33,11 +29,43 @@ defmodule DiscordBot.Llm.OpenAIClient do
     Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_api_token)
   end
 
-  defp handle_response(%{status: 200, body: %{"choices" => [choice], "usage" => usage}}) do
-    {
-      String.to_existing_atom(choice["finish_reason"]),
-      choice["message"],
-      usage
-    }
+  defp model() do
+    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_model)
+  end
+
+  defp handle_response(%{status: 200, body: body}) do
+    output = body["output"]
+    usage = body["usage"]
+
+    case extract_result(output) do
+      {:message, text} ->
+        {:stop, %{"content" => text}, usage}
+
+      {:function_calls, calls} ->
+        {:tool_calls, %{"tool_calls" => calls}, usage}
+    end
+  end
+
+  defp extract_result(output) do
+    function_calls =
+      output
+      |> Enum.filter(&(&1["type"] == "function_call"))
+      |> Enum.map(fn call ->
+        %{
+          "id" => call["call_id"],
+          "function" => %{
+            "name" => call["name"],
+            "arguments" => call["arguments"]
+          }
+        }
+      end)
+
+    if Enum.empty?(function_calls) do
+      message = Enum.find(output, &(&1["type"] == "message"))
+      text = get_in(message, ["content", Access.at(0), "text"]) || ""
+      {:message, text}
+    else
+      {:function_calls, function_calls}
+    end
   end
 end
