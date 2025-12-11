@@ -12,7 +12,7 @@ defmodule DiscordBot.Llm do
   end
 
   defp chat_with_model_repeatedly(input, tools) do
-    tool_definitions = Enum.map(tools, & &1.definition)
+    tool_definitions = Enum.map(tools, &convert_tool_definition/1)
 
     opts = [
       instructions: History.instructions(),
@@ -35,6 +35,21 @@ defmodule DiscordBot.Llm do
           )
 
         chat_with_model_repeatedly(input, tools)
+    end
+  end
+
+  defp convert_tool_definition(%{definition: definition}) do
+    case definition do
+      %{"function" => function} ->
+        %{
+          "type" => "function",
+          "name" => function["name"],
+          "description" => function["description"],
+          "parameters" => function["parameters"]
+        }
+
+      _ ->
+        definition
     end
   end
 
