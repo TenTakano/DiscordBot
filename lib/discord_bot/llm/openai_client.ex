@@ -1,11 +1,10 @@
 defmodule DiscordBot.Llm.OpenAIClient do
   alias DiscordBot.HttpClient
 
-  @model "gpt-4.1"
   @endpoint "https://api.openai.com/v1/responses"
 
   def ask_model(input, opts \\ []) do
-    body = %{"model" => @model, "input" => input}
+    body = %{"model" => model(), "input" => input}
 
     body =
       Enum.into(opts, body, fn {key, value} ->
@@ -28,6 +27,10 @@ defmodule DiscordBot.Llm.OpenAIClient do
 
   defp api_token() do
     Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_api_token)
+  end
+
+  defp model() do
+    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_model)
   end
 
   defp handle_response(%{status: 200, body: body}) do
