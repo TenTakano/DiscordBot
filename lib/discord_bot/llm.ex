@@ -5,15 +5,21 @@ defmodule DiscordBot.Llm do
   alias DiscordBot.Llm.{History, OpenAIClient, ToolFunction, Usage}
 
   def chat_with_model(message) do
-    history = History.generate_initial_history(message)
+    input = History.generate_initial_input(message)
     tools = get_tool_functions()
 
-    chat_with_model_repeatedly(history, tools)
+    chat_with_model_repeatedly(input, tools)
   end
 
-  defp chat_with_model_repeatedly(history, tools) do
+  defp chat_with_model_repeatedly(input, tools) do
     tool_definitions = Enum.map(tools, & &1.definition)
-    {reason, message, usage} = OpenAIClient.ask_model(history, tools: tool_definitions)
+
+    opts = [
+      instructions: History.instructions(),
+      tools: tool_definitions
+    ]
+
+    {reason, message, usage} = OpenAIClient.ask_model(input, opts)
     upsert_usage(usage["total_tokens"])
 
     case {reason, message} do
@@ -21,14 +27,14 @@ defmodule DiscordBot.Llm do
         %{content: message["content"], total_tokens: usage["total_tokens"]}
 
       {:tool_calls, message} ->
-        history =
+        input =
           Enum.reduce(
             message["tool_calls"],
-            History.append_tool_call(history, message),
+            History.append_tool_call(input, message["tool_calls"]),
             &execute_tool_function(&1, &2, tools)
           )
 
-        chat_with_model_repeatedly(history, tools)
+        chat_with_model_repeatedly(input, tools)
     end
   end
 

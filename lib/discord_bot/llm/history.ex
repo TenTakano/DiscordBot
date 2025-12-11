@@ -1,12 +1,8 @@
 defmodule DiscordBot.Llm.History do
   alias DiscordBot.Llm.Prompts
 
-  def generate_initial_history(message) do
+  def generate_initial_input(message) do
     [
-      %{
-        "role" => "system",
-        "content" => Prompts.system_prompt()
-      },
       %{
         "role" => "user",
         "content" => message
@@ -14,15 +10,32 @@ defmodule DiscordBot.Llm.History do
     ]
   end
 
-  def append_tool_call(history, tool_call_message) do
-    List.insert_at(history, -1, tool_call_message)
+  def instructions do
+    Prompts.system_prompt()
   end
 
-  def append_tool_result(history, tool_call_id, tool_result) do
-    List.insert_at(history, -1, %{
-      "role" => "tool",
-      "tool_call_id" => tool_call_id,
-      "content" => tool_result
-    })
+  def append_tool_call(input, tool_calls) do
+    function_calls =
+      Enum.map(tool_calls, fn call ->
+        %{
+          "type" => "function_call",
+          "call_id" => call["id"],
+          "name" => call["function"]["name"],
+          "arguments" => call["function"]["arguments"]
+        }
+      end)
+
+    input ++ function_calls
+  end
+
+  def append_tool_result(input, tool_call_id, tool_result) do
+    input ++
+      [
+        %{
+          "type" => "function_call_output",
+          "call_id" => tool_call_id,
+          "output" => tool_result
+        }
+      ]
   end
 end
