@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+
+# Elixir/Phoenix
+_build/
+deps/
+.elixir_ls/
+*.ez
+erl_crash.dump
+
+# Node
+/assets/node_modules/
+node_modules/
+
+# Generated files
+/priv/static/assets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Test
+/cover/
+/test/
+
+# Secrets
+.env
+*.pem

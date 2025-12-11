@@ -1,9 +1,0 @@
-[phases.build]
-cmds = [
-    "mix compile",
-    "mix assets.deploy",
-    "mix release"
-]
-
-[start]
-cmd = "/app/_build/prod/rel/discord_bot/bin/discord_bot eval 'DiscordBot.Release.migrate()' && /app/_build/prod/rel/discord_bot/bin/server"
