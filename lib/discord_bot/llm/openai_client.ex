@@ -13,11 +13,22 @@ defmodule DiscordBot.Llm.OpenAIClient do
         {Atom.to_string(key), value}
       end)
 
-    request!(@endpoint, body) |> handle_response()
+    case request(@endpoint, body) do
+      {:ok, response} ->
+        handle_response(response)
+
+      {:error, %Req.TransportError{reason: reason}} ->
+        Logger.error("OpenAI API transport error: #{inspect(reason)}")
+        {:error, "APIへの接続でエラーが発生しました"}
+
+      {:error, exception} ->
+        Logger.error("OpenAI API error: #{inspect(exception)}")
+        {:error, "APIエラーが発生しました"}
+    end
   end
 
-  defp request!(url, body) do
-    HttpClient.post!(url, headers: headers(), json: body)
+  defp request(url, body) do
+    HttpClient.post(url, headers: headers(), json: body)
   end
 
   defp headers() do
