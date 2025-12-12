@@ -1,4 +1,4 @@
-defmodule DiscordBot.Adapter.Ip do
+defmodule DiscordBot.Discord.Ip do
   @api_endpoint "https://inet-ip.info/ip"
 
   def get_global_ip() do

@@ -26,7 +26,7 @@ end
 alias DiscordBot.Repo
 
 tool_function_definitions = [
-  {DiscordBot.Adapter.Ip, :get_global_ip,
+  {DiscordBot.Discord.Ip, :get_global_ip,
    %{
      type: "function",
      function: %{

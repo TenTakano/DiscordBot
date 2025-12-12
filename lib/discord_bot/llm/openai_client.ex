@@ -1,7 +1,7 @@
 defmodule DiscordBot.Llm.OpenAIClient do
   require Logger
 
-  alias DiscordBot.HttpClient
+  alias DiscordBot.Infra.HttpClient
 
   @endpoint "https://api.openai.com/v1/responses"
 

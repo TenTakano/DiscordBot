@@ -65,11 +65,11 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :discord_bot, DiscordBot.Adapter, start_listener: true
+config :discord_bot, DiscordBot.Discord, start_listener: true
 
-config :discord_bot, DiscordBot.RandomUtil, module: DiscordBot.RandomUtil.Impl
-config :discord_bot, DiscordBot.Adapter.Api, module: DiscordBot.Adapter.Api.Impl
-config :discord_bot, DiscordBot.HttpClient, module: DiscordBot.HttpClient.Impl
+config :discord_bot, DiscordBot.Discord.Random, module: DiscordBot.Discord.Random.Impl
+config :discord_bot, DiscordBot.Discord.Api, module: DiscordBot.Discord.Api.Impl
+config :discord_bot, DiscordBot.Infra.HttpClient, module: DiscordBot.Infra.HttpClient.Impl
 
 config :ueberauth, Ueberauth,
   providers: [

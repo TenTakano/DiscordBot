@@ -1,7 +1,7 @@
-defmodule DiscordBot.Adapter.DiceTest do
+defmodule DiscordBot.Discord.DiceTest do
   use ExUnit.Case, async: true
 
-  alias DiscordBot.Adapter.Dice
+  alias DiscordBot.Discord.Dice
 
   describe "capture_dice_roll/1" do
     test "captures dice roll" do

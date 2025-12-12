@@ -1,17 +1,17 @@
-defmodule DiscordBot.RandomUtil.Behaviour do
+defmodule DiscordBot.Discord.Random.Behaviour do
   @callback random(integer()) :: integer()
 end
 
-defmodule DiscordBot.RandomUtil.Impl do
-  @behaviour DiscordBot.RandomUtil.Behaviour
+defmodule DiscordBot.Discord.Random.Impl do
+  @behaviour DiscordBot.Discord.Random.Behaviour
 
-  @impl DiscordBot.RandomUtil.Behaviour
+  @impl DiscordBot.Discord.Random.Behaviour
   def random(max) do
     :rand.uniform(max)
   end
 end
 
-defmodule DiscordBot.RandomUtil do
+defmodule DiscordBot.Discord.Random do
   def random(max), do: random_impl().random(max)
 
   defp random_impl() do
