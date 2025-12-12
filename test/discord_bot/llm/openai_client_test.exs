@@ -3,7 +3,7 @@ defmodule DiscordBot.Llm.OpenAiClientTest do
 
   import Mox
 
-  alias DiscordBot.HttpClient.Mock
+  alias DiscordBot.Infra.HttpClient.Mock
   alias DiscordBot.Llm.OpenAIClient
 
   setup :verify_on_exit!

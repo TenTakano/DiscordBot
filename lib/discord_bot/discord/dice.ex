@@ -1,5 +1,5 @@
 defmodule DiscordBot.Discord.Dice do
-  alias DiscordBot.RandomUtil
+  alias DiscordBot.Discord.Random
 
   def capture_dice_roll(message) do
     normalized_downcase = String.normalize(message, :nfkc) |> String.downcase()
@@ -7,6 +7,6 @@ defmodule DiscordBot.Discord.Dice do
   end
 
   def roll_dice(count, sides) do
-    Enum.map(1..count, fn _ -> RandomUtil.random(sides) end) |> Enum.sum()
+    Enum.map(1..count, fn _ -> Random.random(sides) end) |> Enum.sum()
   end
 end

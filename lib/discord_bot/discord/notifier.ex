@@ -1,5 +1,5 @@
-defmodule DiscordBot.Notifier do
-  alias DiscordBot.HttpClient
+defmodule DiscordBot.Discord.Notifier do
+  alias DiscordBot.Infra.HttpClient
 
   def send_message(message) do
     headers = ["Content-Type": "application/json"]

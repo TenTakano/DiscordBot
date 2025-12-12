@@ -24,7 +24,7 @@ defmodule DiscordBotWeb.LlmController do
       end
 
       if validated.send_notification do
-        DiscordBot.Notifier.send_message("Total tokens: #{tokens}, USD cost: #{usd_cost}")
+        DiscordBot.Discord.Notifier.send_message("Total tokens: #{tokens}, USD cost: #{usd_cost}")
       end
 
       json(conn, %{tokens: tokens, usd_cost: usd_cost})
