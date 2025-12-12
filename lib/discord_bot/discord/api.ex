@@ -1,4 +1,4 @@
-defmodule DiscordBot.Adapter.Api.Behaviour do
+defmodule DiscordBot.Discord.Api.Behaviour do
   @callback(
     create_message(integer(), String.t()) :: {:ok, any},
     {:error, Nostrum.Error.ApiError.t()}
@@ -8,26 +8,26 @@ defmodule DiscordBot.Adapter.Api.Behaviour do
   @callback start_typing!(integer()) :: {:ok}
 end
 
-defmodule DiscordBot.Adapter.Api.Impl do
-  @behaviour DiscordBot.Adapter.Api.Behaviour
+defmodule DiscordBot.Discord.Api.Impl do
+  @behaviour DiscordBot.Discord.Api.Behaviour
 
-  @impl DiscordBot.Adapter.Api.Behaviour
+  @impl DiscordBot.Discord.Api.Behaviour
   def create_message(channel_id, content) do
     Nostrum.Api.Message.create(channel_id, content)
   end
 
-  @impl DiscordBot.Adapter.Api.Behaviour
+  @impl DiscordBot.Discord.Api.Behaviour
   def get_current_user!() do
     Nostrum.Cache.Me.get()
   end
 
-  @impl DiscordBot.Adapter.Api.Behaviour
+  @impl DiscordBot.Discord.Api.Behaviour
   def start_typing!(channel_id) do
     Nostrum.Api.Channel.start_typing(channel_id)
   end
 end
 
-defmodule DiscordBot.Adapter.Api do
+defmodule DiscordBot.Discord.Api do
   def create_message(channel_id, content), do: api_impl().create_message(channel_id, content)
 
   def get_current_user!(), do: api_impl().get_current_user!()

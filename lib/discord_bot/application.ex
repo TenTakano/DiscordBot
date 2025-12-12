@@ -18,7 +18,7 @@ defmodule DiscordBot.Application do
       # {DiscordBot.Worker, arg},
       # Start to serve requests, typically the last entry
       DiscordBotWeb.Endpoint,
-      DiscordBot.Adapter
+      DiscordBot.Discord
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,7 +1,7 @@
-defmodule DiscordBot.Adapter.EventListener do
+defmodule DiscordBot.Discord.EventListener do
   use Nostrum.Consumer
 
-  alias DiscordBot.Adapter.{Api, Dice, Ip}
+  alias DiscordBot.Discord.{Api, Dice, Ip}
 
   def handle_event({:MESSAGE_CREATE, %{author: %{bot: nil}} = msg, _ws_state}) do
     with {:ok, mentioned?, message_body} <- need_evaluate?(msg.content) do

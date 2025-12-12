@@ -1,4 +1,4 @@
-defmodule DiscordBot.Adapter.Dice do
+defmodule DiscordBot.Discord.Dice do
   alias DiscordBot.RandomUtil
 
   def capture_dice_roll(message) do

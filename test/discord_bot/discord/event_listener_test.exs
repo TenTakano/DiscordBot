@@ -1,10 +1,10 @@
-defmodule DiscordBot.Adapter.EventListenerTest do
+defmodule DiscordBot.Discord.EventListenerTest do
   use ExUnit.Case
 
   import Mox
 
-  alias DiscordBot.Adapter.EventListener
-  alias DiscordBot.Adapter.Api.Mock
+  alias DiscordBot.Discord.EventListener
+  alias DiscordBot.Discord.Api.Mock
 
   setup :verify_on_exit!
 

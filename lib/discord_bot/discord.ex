@@ -1,4 +1,4 @@
-defmodule DiscordBot.Adapter do
+defmodule DiscordBot.Discord do
   use Supervisor
 
   def start_link(args) do
@@ -7,7 +7,7 @@ defmodule DiscordBot.Adapter do
 
   @impl Supervisor
   def init(_init_arg) do
-    children = if start_listener(), do: [DiscordBot.Adapter.EventListener], else: []
+    children = if start_listener(), do: [DiscordBot.Discord.EventListener], else: []
 
     Supervisor.init(children, strategy: :one_for_one)
   end
