@@ -18,8 +18,7 @@ defmodule DiscordBot.Adapter.Api.Impl do
 
   @impl DiscordBot.Adapter.Api.Behaviour
   def get_current_user!() do
-    {:ok, user} = Nostrum.Api.Self.get()
-    user
+    Nostrum.Cache.Me.get()
   end
 
   @impl DiscordBot.Adapter.Api.Behaviour
