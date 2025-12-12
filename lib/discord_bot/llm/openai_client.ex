@@ -6,14 +6,9 @@ defmodule DiscordBot.Llm.OpenAIClient do
   @endpoint "https://api.openai.com/v1/responses"
 
   def ask_model(input, opts \\ []) do
-    body = %{"model" => model(), "input" => input}
-
-    body =
-      Enum.into(opts, body, fn {key, value} ->
-        {Atom.to_string(key), value}
-      end)
-
-    case request(@endpoint, body) do
+    build_body(input, opts)
+    |> post_request()
+    |> case do
       {:ok, response} ->
         handle_response(response)
 
@@ -27,23 +22,24 @@ defmodule DiscordBot.Llm.OpenAIClient do
     end
   end
 
-  defp request(url, body) do
-    HttpClient.post(url, headers: headers(), json: body)
+  defp build_body(input, opts) do
+    model = Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_model)
+    body = %{"model" => model, "input" => input}
+
+    Enum.into(opts, body, fn {key, value} ->
+      {Atom.to_string(key), value}
+    end)
   end
 
-  defp headers() do
-    [
+  defp post_request(body) do
+    api_token = Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_api_token)
+
+    header = [
       "Content-Type": "application/json",
-      Authorization: "Bearer #{api_token()}"
+      Authorization: "Bearer #{api_token}"
     ]
-  end
 
-  defp api_token() do
-    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_api_token)
-  end
-
-  defp model() do
-    Application.get_env(:discord_bot, __MODULE__) |> Keyword.fetch!(:openai_model)
+    HttpClient.post(@endpoint, headers: header, json: body)
   end
 
   defp handle_response(%{status: 200, body: body}) do
