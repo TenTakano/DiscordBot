@@ -83,10 +83,17 @@ jobs:
 
           is_dev=false
 
-          # Check in mix.exs for Elixir deps with only: :dev or only: :test or only: [:dev, :test]
           if [ -f "mix.exs" ]; then
-            if grep -E "{:$DEP_NAME," mix.exs | grep -qE "only:.*(:dev|:test)"; then
-              echo "Found in mix.exs as dev/test dependency"
+            dep_line=$(grep -E "{:$DEP_NAME," mix.exs || true)
+            echo "Dependency line: $dep_line"
+
+            # Check for only: :dev or only: :test or only: [:dev, :test]
+            if echo "$dep_line" | grep -qE "only:.*(:dev|:test)"; then
+              echo "Found in mix.exs as dev/test dependency (only:)"
+              is_dev=true
+            # Check for runtime: Mix.env() == :dev (build tools like esbuild/tailwind)
+            elif echo "$dep_line" | grep -qE "runtime:.*Mix\.env\(\).*==.*:dev"; then
+              echo "Found in mix.exs as dev runtime dependency"
               is_dev=true
             fi
           fi
