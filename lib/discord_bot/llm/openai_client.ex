@@ -1,4 +1,6 @@
 defmodule DiscordBot.Llm.OpenAIClient do
+  require Logger
+
   alias DiscordBot.HttpClient
 
   @endpoint "https://api.openai.com/v1/responses"
@@ -44,6 +46,11 @@ defmodule DiscordBot.Llm.OpenAIClient do
       {:function_calls, calls} ->
         {:tool_calls, %{"tool_calls" => calls}, usage}
     end
+  end
+
+  defp handle_response(%{status: status, body: body}) do
+    Logger.error("OpenAI API error: status=#{status}, body=#{inspect(body)}")
+    {:error, "APIエラーが発生しました（ステータス: #{status}）"}
   end
 
   defp extract_result(output) do

@@ -1,5 +1,6 @@
 defmodule DiscordBot.Llm do
   import Ecto.Query
+  require Logger
 
   alias DiscordBot.Repo
   alias DiscordBot.Llm.{History, OpenAIClient, ToolFunction, Usage}
@@ -19,14 +20,17 @@ defmodule DiscordBot.Llm do
       tools: tool_definitions
     ]
 
-    {reason, message, usage} = OpenAIClient.ask_model(input, opts)
-    upsert_usage(usage["total_tokens"])
+    case OpenAIClient.ask_model(input, opts) do
+      {:error, error_message} ->
+        %{content: error_message}
 
-    case {reason, message} do
-      {:stop, message} ->
+      {:stop, message, usage} ->
+        upsert_usage(usage["total_tokens"])
         %{content: message["content"], total_tokens: usage["total_tokens"]}
 
-      {:tool_calls, message} ->
+      {:tool_calls, message, usage} ->
+        upsert_usage(usage["total_tokens"])
+
         input =
           Enum.reduce(
             message["tool_calls"],
@@ -35,6 +39,10 @@ defmodule DiscordBot.Llm do
           )
 
         chat_with_model_repeatedly(input, tools)
+
+      unexpected ->
+        Logger.error("Unexpected response from OpenAI: #{inspect(unexpected)}")
+        %{content: "やれやれ"}
     end
   end
 
