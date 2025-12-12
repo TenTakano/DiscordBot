@@ -1,0 +1,114 @@
+name: Auto-merge Dependabot PRs for Dev Dependencies
+
+on:
+  workflow_run:
+    workflows: ["CI for Dependabot PRs"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Get PR number
+        id: pr
+        run: |
+          PR_NUMBER=$(gh api /repos/${{ github.repository }}/pulls \
+            --jq ".[] | select(.head.sha == \"${{ github.event.workflow_run.head_sha }}\") | .number" | head -1)
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Could not find PR for this workflow run"
+            exit 1
+          fi
+
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "Found PR #$PR_NUMBER"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if PR is from dependabot
+        id: check-author
+        run: |
+          AUTHOR=$(gh api /repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }} --jq '.user.login')
+          echo "PR author: $AUTHOR"
+
+          if [ "$AUTHOR" != "dependabot[bot]" ]; then
+            echo "Not a dependabot PR, skipping"
+            echo "is_dependabot=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "is_dependabot=true" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract dependency name
+        if: steps.check-author.outputs.is_dependabot == 'true'
+        id: dep
+        run: |
+          PR_DATA=$(gh api /repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }})
+          PR_TITLE=$(echo "$PR_DATA" | jq -r '.title')
+
+          echo "PR Title: $PR_TITLE"
+
+          # Dependabot format: "dependabot: bump {package} from X to Y"
+          DEP_NAME=$(echo "$PR_TITLE" | sed -E 's/^(dependabot: )?[Bb]ump ([^ ]+) from .*/\2/')
+          if [ -z "$DEP_NAME" ] || [ "$DEP_NAME" = "$PR_TITLE" ]; then
+            echo "::error::Failed to extract dependency name from PR title: $PR_TITLE"
+            exit 1
+          fi
+
+          echo "dependency-names=$DEP_NAME" >> $GITHUB_OUTPUT
+          echo "Dependency: $DEP_NAME"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout code
+        if: steps.check-author.outputs.is_dependabot == 'true'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Check if dev dependency
+        if: steps.check-author.outputs.is_dependabot == 'true'
+        id: check-dev
+        run: |
+          DEP_NAME="${{ steps.dep.outputs.dependency-names }}"
+          echo "Checking if '$DEP_NAME' is a dev dependency..."
+
+          is_dev=false
+
+          # Check in mix.exs for Elixir deps with only: :dev or only: :test or only: [:dev, :test]
+          if [ -f "mix.exs" ]; then
+            if grep -E "{:$DEP_NAME," mix.exs | grep -qE "only:.*(:dev|:test)"; then
+              echo "Found in mix.exs as dev/test dependency"
+              is_dev=true
+            fi
+          fi
+
+          if [ "$is_dev" = true ]; then
+            echo "is_dev=true" >> $GITHUB_OUTPUT
+            echo "This is a development dependency"
+          else
+            echo "is_dev=false" >> $GITHUB_OUTPUT
+            echo "This is a production dependency"
+          fi
+
+      - name: Merge PR
+        if: steps.check-author.outputs.is_dependabot == 'true' && steps.check-dev.outputs.is_dev == 'true'
+        run: |
+          gh pr merge ${{ steps.pr.outputs.number }} --squash
+          echo "Merged dev dependency update PR #${{ steps.pr.outputs.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip production dependency
+        if: steps.check-author.outputs.is_dependabot == 'true' && steps.check-dev.outputs.is_dev == 'false'
+        run: |
+          echo "Skipping auto-merge for production dependency: ${{ steps.dep.outputs.dependency-names }}"
+          echo "Manual review required"
