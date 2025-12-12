@@ -1,0 +1,8 @@
+#!/bin/sh
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.exs\?$' || true)
+
+if [ -n "$staged_files" ]; then
+  mix format $staged_files
+  echo "$staged_files" | xargs git add
+fi

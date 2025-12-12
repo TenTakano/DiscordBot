@@ -136,7 +136,8 @@ config :discord_bot, DiscordBot.Llm.OpenAIClient,
   openai_api_token: System.get_env("OPENAI_API_TOKEN"),
   openai_model: System.get_env("OPENAI_MODEL") || "gpt-5.1"
 
-config :discord_bot, DiscordBot.Discord.Notifier, webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
+config :discord_bot, DiscordBot.Discord.Notifier,
+  webhook_url: System.get_env("NOTIFICATION_WEBHOOK_URL")
 
 config :ueberauth, Ueberauth.Strategy.Discord.OAuth,
   client_id: System.get_env("DISCORD_CLIENT_ID"),
