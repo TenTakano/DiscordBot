@@ -13,7 +13,7 @@ defmodule DiscordBot.Discord.EventListener do
           Api.create_message(msg.channel_id, generate_dice_roll_message(result, msg))
 
         {:other, true} ->
-          Api.start_typing!(msg.channel_id)
+          Task.start(fn -> Api.start_typing!(msg.channel_id) end)
 
           Api.create_message(
             msg.channel_id,
@@ -26,7 +26,9 @@ defmodule DiscordBot.Discord.EventListener do
     end
   end
 
-  def handle_event(_event), do: :ignore
+  def handle_event(_event) do
+    :ignore
+  end
 
   def need_evaluate?(content) do
     Regex.scan(~r/<@\d+>/, content)
