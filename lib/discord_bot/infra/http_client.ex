@@ -6,9 +6,12 @@ end
 defmodule DiscordBot.Infra.HttpClient.Impl do
   @behaviour DiscordBot.Infra.HttpClient.Behaviour
 
+  # pool_max_idle_time: Terminate idle connection pools after 60s to avoid
+  # stale connections causing timeouts (see GitHub issue sneako/finch#272)
   defp default_options do
     [
       pool_timeout: 5_000,
+      pool_max_idle_time: 60_000,
       receive_timeout: 60_000,
       retry: :transient,
       retry_delay: &(&1 * 1_000),
