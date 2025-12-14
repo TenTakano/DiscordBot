@@ -6,14 +6,24 @@ end
 defmodule DiscordBot.Infra.HttpClient.Impl do
   @behaviour DiscordBot.Infra.HttpClient.Behaviour
 
+  defp default_options do
+    [
+      pool_timeout: 5_000,
+      receive_timeout: 60_000,
+      retry: :transient,
+      retry_delay: &(&1 * 1_000),
+      max_retries: 2
+    ]
+  end
+
   @impl DiscordBot.Infra.HttpClient.Behaviour
   def post(url, options) do
-    Req.post(url, options)
+    Req.post(url, Keyword.merge(default_options(), options))
   end
 
   @impl DiscordBot.Infra.HttpClient.Behaviour
   def post!(url, options) do
-    Req.post!(url, options)
+    Req.post!(url, Keyword.merge(default_options(), options))
   end
 end
 
