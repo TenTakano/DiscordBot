@@ -60,7 +60,7 @@ defmodule DiscordBot.MixProject do
       {:bandit, "~> 1.5"},
       {:mox, "~> 1.2"},
       {:nostrum, "~> 0.10", runtime: Mix.env() != :test},
-      {:req, "~> 0.5.8"},
+      {:req, "~> 0.7.5"},
       {:uuidv7, "~> 1.0"},
       {:ueberauth, "~> 0.10.8"},
       {:ueberauth_discord, "~> 0.7.0"}
