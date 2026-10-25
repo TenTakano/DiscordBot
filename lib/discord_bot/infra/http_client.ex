@@ -10,8 +10,7 @@ defmodule DiscordBot.Infra.HttpClient.Impl do
   # stale connections causing timeouts (see GitHub issue sneako/finch#272)
   defp default_options do
     [
-      pool_timeout: 5_000,
-      pool_max_idle_time: 60_000,
+      finch: [pool_timeout: 5_000, pool_max_idle_time: 60_000],
       receive_timeout: 60_000,
       retry: :transient,
       retry_delay: &(&1 * 1_000),
